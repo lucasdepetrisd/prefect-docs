@@ -1,33 +1,32 @@
 import os
-# import logging
+import logging
 from prefect import flow, task
 
-# from commons.log_config import obtener_nombre_script, inicializar_logger_prefect, obtener_logger_prefect
-from commons.log_config import obtener_nombre_script, PrefectLogger
+# print("PYTHONPATH:" + os.getenv("PYTHONPATH"))
 
-FILE_NAME = obtener_nombre_script()
+from electracommons.log_config import FILE_NAME, PrefectLogger
 
 os.environ["PREFECT_LOGGING_EXTRA_LOGGERS"] = FILE_NAME
 
-# mylogger = logging.getLogger(FILE_NAME)
-# mylogger.setLevel(logging.DEBUG)
-# mylogger.propagate = True
+mylogger = logging.getLogger(FILE_NAME)
+mylogger.setLevel(logging.DEBUG)
+mylogger.propagate = True
 
-logger_prefect = PrefectLogger(r"C:\Users\Lucas\Documents\Consulters\Electra\PythonTest\src\logs\test31.log")
+logger_prefect = PrefectLogger()
 
 @task
 def mi_tarea():
-    # mylogger.info("Iniciando tarea...")
-    # mylogger.info("Tarea finalizada...")
+    mylogger.info("Iniciando tarea...")
+    mylogger.info("Tarea finalizada...")
     logger = logger_prefect.obtener_logger_prefect()
     logger.info("Iniciando tarea por prefect...")
-    logger = logger_prefect.cambiar_rotfile_handler_params(r"C:\Users\Lucas\Documents\Consulters\Electra\PythonTest\src\logs\test32.log")
+    logger = logger_prefect.cambiar_rotfile_handler_params(r"C:\Users\Lucas\OneDrive\Consulters\Electra\ElectraTest\src\logs\test32.log")
     logger.info("Tarea finalizada por prefect...")
 
 @flow
 def mi_flujo():
-    # mylogger.info("Hola")
     logger = logger_prefect.obtener_logger_prefect()
+    mylogger.info("Hola")
     logger.info("Hola pero de prefect")
     mi_tarea()
 

@@ -150,7 +150,11 @@ class PrefectLogger(object):
         Retorna:
             prefect_logger: Instancia actualizada del logger de Prefect.
         """
-        self.__log_path = log_path or self.DEFAULT_LOG_PATH
+        if not os.path.exists(log_path):
+            print(f"Error al cambiar el directorio de salida.\nNo se reconoce el directorio {log_path}. Se utilizara el predeterminado: {LOG_PATH}")
+            self.__log_path = self.DEFAULT_LOG_PATH
+        else: self.__log_path = log_path
+
         self.__when = when or self.DEFAULT_WHEN
         self.__interval = interval or self.DEFAULT_INTERVAL
         self.__backup_count = backup_count or self.DEFAULT_BACKUP_COUNT
@@ -160,7 +164,7 @@ class PrefectLogger(object):
         return self.__logger_prefect
 
 
-def obtener_nombre_script():
-    # print("__main__.__file__: " + __main__.__file__) # Otra opcion es obtener importando __main__
-    # print("programname: " + str(lib_programname.get_path_executed_script()))
-    return FILE_NAME
+# def obtener_nombre_script():
+#     # print("__main__.__file__: " + __main__.__file__) # Otra opcion es obtener importando __main__
+#     # print("programname: " + str(lib_programname.get_path_executed_script()))
+#     return FILE_NAME
