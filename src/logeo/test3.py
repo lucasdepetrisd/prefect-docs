@@ -20,7 +20,7 @@ def mi_tarea():
     mylogger.info("Tarea finalizada...")
     logger = logger_prefect.obtener_logger_prefect()
     logger.info("Iniciando tarea por prefect...")
-    logger = logger_prefect.cambiar_rotfile_handler_params(r"C:\Users\Lucas\OneDrive\Consulters\Electra\ElectraTest\src\logs\test32.log")
+    logger = logger_prefect.cambiar_rotfile_handler_params(r"C:\Users\Lucas\OneDrive\Consulters\Electra\ElectraTest\src\logeo\logs\test32.log")
     logger.info("Tarea finalizada por prefect...")
 
 @flow
