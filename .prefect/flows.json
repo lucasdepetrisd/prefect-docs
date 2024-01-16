@@ -1,0 +1,3 @@
+{
+  "Watchdog": "src\\watchdog\\watchdog.py:watchdog"
+}
