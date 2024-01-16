@@ -1,0 +1,3 @@
+{
+  "main-flow": "async_flows.py:main_flow"
+}

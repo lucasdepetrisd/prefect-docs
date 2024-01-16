@@ -19,6 +19,6 @@ def my_flow():
 
 
 if __name__ == '__main__':
-    # my_flow.serve(name="my-second-deployment",
-    #                tags=["testing"])
-    my_flow()
+    my_flow.serve(name="my-second-deployment",
+                   tags=["testing"])
+    # my_flow()
