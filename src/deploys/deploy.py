@@ -10,7 +10,7 @@ def mi_tarea():
     logger.info("Iniciando tarea por prefect...")
     logger.info("Tarea finalizada por prefect...")
 
-@flow
+@flow(timeout_seconds=60)
 def my_flow():
     logger = logger_prefect.obtener_logger_prefect()
     logger.info("Hola pero de prefect")
