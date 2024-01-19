@@ -34,7 +34,11 @@ deployments:
 - name: watchdog-deploy
   version:
   tags: []
-  description:
+  description: "Este script permite cancelar ejecuciones de flujos atrasadas (en estado\
+  \ Late) o que se encuentran corriendo (estado Running) por demasiado tiempo. \n\
+  Se pueden ajustar sus parametros para cada caso utilizando un Custom Run. \nEn caso\
+  \ que se quisiera detener todos los procesos corriendo se debe poner long_running_threshold_hours\
+  \ = 0"
   entrypoint: src\watchdog\watchdog.py:watchdog
   parameters: {}
   work_pool:
@@ -42,6 +46,8 @@ deployments:
     work_queue_name:
     job_variables: {}
   schedule:
-    interval: 1800.0
-    anchor_date: '2024-01-15T04:40:11.408964+00:00'
-    timezone: UTC
+    cron: 0,30 * * * *
+    timezone: America/Buenos_Aires
+    day_or: true
+    active: true
+

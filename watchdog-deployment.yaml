@@ -1,0 +1,59 @@
+###
+### A complete description of a Prefect Deployment for flow 'Watchdog'
+###
+name: watchdog-deploy
+description: "Este script permite cancelar ejecuciones de flujos atrasadas (en estado\
+  \ Late) o que se encuentran corriendo (estado Running) por demasiado tiempo. \n\
+  Se pueden ajustar sus parametros para cada caso utilizando un Custom Run. \nEn caso\
+  \ que se quisiera detener todos los procesos corriendo se debe poner long_running_threshold_hours\
+  \ = 0"
+version: 6eb20e57d9d36d8b20a53e9bca8486bf
+# The work queue that will handle this deployment's runs
+work_queue_name: default
+work_pool_name: watchdog-pool
+tags: []
+parameters: {}
+schedule:
+  cron: 0,30 * * * *
+  timezone: America/Buenos_Aires
+  day_or: true
+is_schedule_active: true
+infra_overrides: {}
+infrastructure:
+  type: process
+  env: {}
+  labels: {}
+  name: null
+  command: null
+  stream_output: true
+  working_dir: null
+  block_type_slug: process
+  _block_type_slug: process
+
+###
+### DO NOT EDIT BELOW THIS LINE
+###
+flow_name: Watchdog
+manifest_path: null
+storage: null
+path: C:\Users\Lucas\OneDrive\Consulters\Electra\ElectraTest
+entrypoint: src\watchdog\watchdog.py:watchdog
+parameter_openapi_schema:
+  title: Parameters
+  type: object
+  properties:
+    stale_threshold_hours:
+      title: stale_threshold_hours
+      default: 12
+      position: 0
+      type: number
+    long_running_threshold_hours:
+      title: long_running_threshold_hours
+      default: 1
+      position: 1
+      type: number
+  required: null
+  definitions: null
+timestamp: '2024-01-17T05:00:03.284194+00:00'
+triggers: []
+enforce_parameter_schema: null

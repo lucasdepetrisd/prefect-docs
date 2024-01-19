@@ -50,14 +50,14 @@ async def find_long_running_flows(threshold_hours: float) -> list[UUID]:
                 "El ID %s es el del Watchdog actual. No se cancelara.", str(flow_run.flow_id))
 
     logger.info(
-        f"Se encontraron {len(filtered_flows)} flujos de larga duracion (> {threshold_hours} horas)\n "
+        f"Se encontraron {len(filtered_flows)} flujos de larga duracion (> {threshold_hours} horas)"
         + "\n ".join([f"{flow_run.name} ({flow_run.id})" for flow_run in filtered_flows])
     )
 
     return [flow_run.id for flow_run in filtered_flows]
 
 
-@task(timeout_seconds=30)
+@task#(timeout_seconds=30)
 async def find_stale_flows(threshhold_hours: float) -> list[UUID]:
     # await asyncio.sleep(20)
     async with get_client() as client:
@@ -83,14 +83,14 @@ async def find_stale_flows(threshhold_hours: float) -> list[UUID]:
                 "El ID %s es el del Watchdog actual. No se cancelara.", str(flow_run.flow_id))
 
     logger.info(
-        f"Se encontraron {len(filtered_flows)} flujos con alta demora (> {threshhold_hours} horas)\n "
+        f"Se encontraron {len(filtered_flows)} flujos con alta demora (> {threshhold_hours} horas)"
         + "\n ".join([f"{flow_run.name} ({flow_run.id})" for flow_run in filtered_flows])
     )
 
     return [flow_run.id for flow_run in filtered_flows]
 
 
-@task(timeout_seconds=20)
+@task#(timeout_seconds=20)
 async def cancel_flow_runs(flow_run_id: UUID):
     logger = logger_prefect.obtener_logger_prefect()
 
@@ -128,8 +128,11 @@ async def send_log(client: PrefectClient, flow_run_id: UUID, message: str):
     await client.create_logs(logs=[log_cancelacion])
 
 
-@flow(name="Watchdog", timeout_seconds=60)
+@flow(name="Watchdog")#, timeout_seconds=60)
 async def watchdog(stale_threshold_hours: float = 12, long_running_threshold_hours: float = 1):
+    logger = logger_prefect.obtener_logger_prefect()
+    # logger.info("----------------------------------")
+
     # Obtengo la diferencia de tiempo entre que se programó y empezó
     flow_timezone = CURRENT_FLOW_RUN.scheduled_start_time.tzinfo
     time_difference = datetime.now(flow_timezone) - CURRENT_FLOW_RUN.scheduled_start_time
