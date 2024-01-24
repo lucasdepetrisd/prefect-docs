@@ -2,10 +2,15 @@
 Para el repositorio o copiar a un documento compartido
 
 ## Perfiles
+Los perfiles en Prefect permiten a los usuarios configurar y almacenar ajustes específicos del entorno que se pueden activar o desactivar según sea necesario. Esto es útil para manejar diferentes configuraciones de Prefect, como puntos finales de API, configuraciones de seguridad y otras preferencias a nivel de usuario.
+
+
 
 
 ## Deploys
-Los deploys son conexiones del servidor de prefect con nuestro código. Los deploys nos permiten establecer la ubicación del script (ya sea local o en git) y configurar como se ejecutará (de manera manual, programada, por intervalos, etc). Son paralelos a las tareas que utilizabamos en el Programador de Tareas de Windows.
+Los deploys (despliegues) son conexiones del servidor local de prefect con nuestro código. Los deploys nos permiten establecer la ubicación del script (ya sea local o en git) y configurar como se ejecutará (de manera manual, programada, por intervalos, etc). Son el paralelo a las tareas que utilizabamos en el Programador de Tareas de Windows.
+
+Los despliegues son configuraciones que definen cómo y dónde se ejecutan los flujos de trabajo de Prefect. Los deploys incluyen detalles como la ubicación del código del flujo, las variables de entorno requeridas, los comandos de ejecución y otro tipo de infraestructura necesaria para la correcta ejecución del flujo.
 
 Crear un deploy es sencillo y se puede hacer con el comando:
 ```prefect deploy```.
@@ -56,7 +61,7 @@ Luego se nos solicitaran diferentes configuraciones para el deploy:
 
 ## Work Pools
 
-Las Work Pools o Grupos de Trabajos
+En Prefect, los Work Pools (grupos de trabajo) son conjuntos de trabajadores que se pueden configurar para ejecutar flujos de trabajo específicos. Permiten la gestión y el dimensionamiento eficaz de los recursos disponibles para la ejecución de los trabajos en diferentes entornos, como la producción o el desarrollo.
 
 ## Logeo
 

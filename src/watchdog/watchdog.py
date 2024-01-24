@@ -130,7 +130,7 @@ async def send_log(client: PrefectClient, flow_run_id: UUID, message: str):
 
 @flow(name="Watchdog")#, timeout_seconds=60)
 async def watchdog(stale_threshold_hours: float = 12, long_running_threshold_hours: float = 1):
-    logger = logger_prefect.obtener_logger_prefect()
+    logger_prefect.obtener_logger_prefect()
     # logger.info("----------------------------------")
 
     # Obtengo la diferencia de tiempo entre que se programó y empezó
