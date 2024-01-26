@@ -94,8 +94,8 @@ Resultados:
 ![Resultados subflujo](img/resultados_subflujo.png)
 
 > [!WARNING]
-    > Si bien un flujo puede ejecutar subflujos, y estos a su vez ejecutar tareas, las tareas no pueden ejecutar flujos.  
-    > Por lo tanto las tareas son **unidades atómicas y representan la más mínima expresión de trabajo en una ejecución.**
+> Si bien un flujo puede ejecutar subflujos, y estos a su vez ejecutar tareas, las tareas no pueden ejecutar flujos.  
+> Por lo tanto las tareas son **unidades atómicas y representan la más mínima expresión de trabajo en una ejecución.**
 
 # 4. Deploys
 Los deploys (despliegues) son conexiones del servidor local de prefect con nuestro código. Los deploys nos permiten establecer la ubicación del script (ya sea local o en git) y configurar como se ejecutará (de manera manual, programada, por intervalos, etc). Son el paralelo a las tareas que utilizábamos en el Programador de Tareas de Windows.
