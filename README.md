@@ -1,6 +1,21 @@
 # 1. Documentación de Prefect
 Documentación de Prefect adaptada a su uso en Electra.
 
+## Tabla de contenidos
+- [1. Documentación de Prefect](#1-documentación-de-prefect)
+  - [Tabla de contenidos](#tabla-de-contenidos)
+- [2. Sobre Prefect](#2-sobre-prefect)
+- [3. Flows](#3-flows)
+  - [3.1. Subflows](#31-subflows)
+- [4. Deploys](#4-deploys)
+- [5. Work Pools](#5-work-pools)
+- [6. Logeo](#6-logeo)
+  - [6.1. Logger de Prefect](#61-logger-de-prefect)
+  - [6.2. Logger de Python](#62-logger-de-python)
+  - [6.3. Logger Personalizado](#63-logger-personalizado)
+- [7. Perfiles](#7-perfiles)
+
+
 # 2. Sobre Prefect
 
 Prefect es una plataforma para la automatización y orquestación de flujos de trabajo, diseñada para simplificar y optimizar la ejecución de tareas y procesos complejos. Su enfoque se centra en facilitar la creación, programación y monitoreo de flujos de datos.
@@ -234,19 +249,19 @@ logging.basicConfig(
 )
 
 # Esta linea asigna el nombre "custom" a la instancia de logger permitiendo que Prefect lo escuche 
-mylogger = logging.getLogger('custom')
-mylogger.setLevel(logging.INFO)
+logger = logging.getLogger('custom')
+logger.setLevel(logging.INFO)
 
 # Se debe importar prefect luego de instanciar mylogger. Si se hace después no se detectará
 from prefect import task, flow 
 
 @task
 def mi_tarea(mensaje_tarea: str = ""):
-    mylogger.info("Hola %s desde la tarea", mensaje_tarea)
+    logger.info("Hola %s desde la tarea", mensaje_tarea)
 
 @flow
 def mi_flujo(mensaje_flujo: str = ""):
-    mylogger.info("Hola %s desde el flujo", mensaje_flujo)
+    logger.info("Hola %s desde el flujo", mensaje_flujo)
     mi_tarea(mensaje_flujo)
 
 if __name__ == '__main__':
@@ -273,10 +288,40 @@ Para instalar electracommons en Python se debe tener configurado git en la termi
 pip install git+https://github.com/DesarrollosElectra/electracommons.git
 ```
 
+Una vez instalada la librería se puede llamar como si fuera el logger de Prefect pero con la diferencia de que genera un archivo de logs con todos los registros. También logea correctamente en la IU de Prefect.
 
+Ejemplo de uso:
+
+```python
+from prefect import flow, task
+
+from electracommons.log_config import PrefectLogger
+
+logger_global = PrefectLogger(__file__)
+
+@task
+def mi_tarea(mensaje_tarea: str = ""):
+    logger = logger_global.obtener_logger_prefect()
+    logger.info("Iniciando tarea...")
+    logger.info("Hola %s desde la tarea", mensaje_tarea)
+    
+    # Cambio el archivo de salida
+    logger = logger_global.cambiar_rotfile_handler_params(r"C:\src\logeo\logs\test32.log")
+    logger.info("Tarea finalizada...")
+
+@flow
+def mi_flujo(mensaje_flujo: str = ""):
+    logger = logger_global.obtener_logger_prefect()
+    logger.info("Hola %s desde el flujo", mensaje_flujo)
+    mi_tarea(mensaje_flujo)
+
+if __name__ == '__main__':
+    mi_flujo()
+```
+
+La clase ```PrefectLogger``` tiene un método ```cambiar_rotfile_handler_params```, en el que podemos cambiarle parámetros del manejador de logs para una tarea o flujo especifico, como por ejemplo la ubicación del archivo de logeo o el formato. Para más info leer la documentación de [ElectraCommons](https://github.com/DesarrollosElectra/electracommons)  
 
 Archivo logging.yml
-
 
 # 7. Perfiles
 Los perfiles en Prefect permiten a los usuarios configurar y almacenar ajustes específicos del entorno que se pueden activar o desactivar según sea necesario. Esto es útil para manejar diferentes configuraciones de Prefect, como puntos finales de API, configuraciones de seguridad y otras preferencias a nivel de usuario.
