@@ -288,7 +288,7 @@ Para instalar electracommons en Python se debe tener configurado git en la termi
 pip install git+https://github.com/DesarrollosElectra/electracommons.git
 ```
 
-Una vez instalada la librería se puede llamar como si fuera el logger de Prefect pero con la diferencia de que genera un archivo de logs con todos los registros. También logea correctamente en la IU de Prefect.
+Una vez instalada la librería se llama como al logger de Prefect pero con la diferencia de que genera un archivo de logs con todos los registros y también logea correctamente en la IU de Prefect.
 
 Ejemplo de uso:
 
@@ -306,8 +306,8 @@ def mi_tarea(mensaje_tarea: str = ""):
     logger.info("Hola %s desde la tarea", mensaje_tarea)
     
     # Cambio el archivo de salida
-    logger = logger_global.cambiar_rotfile_handler_params(r"C:\src\logeo\logs\test32.log")
-    logger.info("Tarea finalizada...")
+    logger = logger_global.cambiar_rotfile_handler_params(r"C:\src\logeo\logs\hola.log")
+    logger.info("Tarea finalizada...") # Esto se mostrara solo en hola.log
 
 @flow
 def mi_flujo(mensaje_flujo: str = ""):
@@ -319,9 +319,32 @@ if __name__ == '__main__':
     mi_flujo()
 ```
 
+Resultado en terminal:
+
+![Alt text](img/result_logging.png)
+
+Resultado en archivo de log test.log:
+
+![Alt text](img/result_logfile.png)
+
+Resultado en IU:
+
+![Alt text](img/result_iu.png)
+
 La clase ```PrefectLogger``` tiene un método ```cambiar_rotfile_handler_params```, en el que podemos cambiarle parámetros del manejador de logs para una tarea o flujo especifico, como por ejemplo la ubicación del archivo de logeo o el formato. Para más info leer la documentación de [ElectraCommons](https://github.com/DesarrollosElectra/electracommons)  
 
-Archivo logging.yml
+Para que esto funcione correctamente el archivo de configuración del logeo de Prefect ```logging_new.yml``` que se encuentra en este repositorio debe estar correctamente configurado y seteado:
+
+```sh
+prefect config set PREFECT_LOGGING_SETTINGS_PATH=C:\Users\usuario\.prefect\logging_new.yml
+```
 
 # 7. Perfiles
 Los perfiles en Prefect permiten a los usuarios configurar y almacenar ajustes específicos del entorno que se pueden activar o desactivar según sea necesario. Esto es útil para manejar diferentes configuraciones de Prefect, como puntos finales de API, configuraciones de seguridad y otras preferencias a nivel de usuario.
+
+Entre las configuraciones principales de los perfiles se encuentran
+
+* PREFECT_API_URL='http://127.0.0.2:5000/api' para indicar que las ejecuciones y deploys se dirijan a esa URL.
+* PREFECT_LOGGING_SETTINGS_PATH='C:\Users\tareas\\.prefect\logging_new.yml' para configurar el loggeo con electracommons.log_config
+
+Se pueden agregar variables para que en el momento de la ejecución Prefect las levante y utilice esos valores de manera global.
