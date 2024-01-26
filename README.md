@@ -1,60 +1,112 @@
-# Notas de Prefect
-Para el repositorio o copiar a un documento compartido
+# 1. Documentación de Prefect
+Documentación de Prefect adaptada a su uso en Electra.
 
-## Sobre Prefect
+# 2. Sobre Prefect
 
-Prefect es un orquestrador de tareas
+Prefect es una plataforma para la automatización y orquestación de flujos de trabajo, diseñada para simplificar y optimizar la ejecución de tareas y procesos complejos. Su enfoque se centra en facilitar la creación, programación y monitoreo de flujos de datos.
 
+A diferencia de otros orquestadores, Prefect se esfuerza por ser lo menos invasivo posible, reconociendo que el código escrito ya representa de manera óptima los objetivos del flujo de trabajo y cualquier adaptación a una plataforma supone un esfuerzo que innecesario.
 
-```mermaid
-%%{
-  init: {
-    'theme': 'base',
-    'themeVariables': {
-      'fontSize': '19px'
-    }
-  }
-}%%
+Esta plataforma sigue la idea de "[code as workflows](https://www.prefect.io/blog/prefect-global-coordination-plane#:~:text=Code%20as%20Workflows%3A%20The%20Python%20API)". Esto significa que cualquier función puede convertirse fácilmente en un flujo Prefect simplemente agregando un decorador ```@flow```. Este enfoque nos brinda acceso instantáneo a características como la gestión de errores, los reintentos automáticos, programación de la ejecución y una interfaz de usuario intuitiva para monitorear y controlar nuestros flujos de trabajo.
 
-flowchart LR
-    F("<div style='margin: 5px 10px 5px 5px;'>Flow Code</div>"):::yellow -.-> A("<div style='margin: 5px 10px 5px 5px;'>Deployment Definition</div>"):::gold
-    subgraph Server ["<div style='width: 150px; text-align: center; margin-top: 5px;'>Prefect API</div>"]
-        D("<div style='margin: 5px 10px 5px 5px;'>Deployment</div>"):::green
-    end
-    subgraph Remote Storage ["<div style='width: 160px; text-align: center; margin-top: 5px;'>Remote Storage</div>"]
-        B("<div style='margin: 5px 6px 5px 5px;'>Flow</div>"):::yellow
-    end
-    subgraph Infrastructure ["<div style='width: 150px; text-align: center; margin-top: 5px;'>Infrastructure</div>"]
-        G("<div style='margin: 5px 10px 5px 5px;'>Flow Run</div>"):::blue
-    end
+![Funcionamiento de Prefect](img/funcionamiento_prefect.png)
+*Funcionamiento de Prefect: Este diagrama muestra el flujo de trabajo en Prefect, la definición del código, el despliegue y la ejecución en el servidor.*
 
-    A --> D
-    D --> E("<div style='margin: 5px 10px 5px 5px;'>Worker</div>"):::red
-    B -.-> E
-    A -.-> B
-    E -.-> G
+# 3. Flows
 
-    classDef gold fill:goldenrod,stroke:goldenrod,stroke-width:4px,color:black
-    classDef yellow fill:gold,stroke:gold,stroke-width:4px,color:black
-    classDef gray fill:lightgray,stroke:lightgray,stroke-width:4px
-    classDef blue fill:blue,stroke:blue,stroke-width:4px,color:white
-    classDef green fill:green,stroke:green,stroke-width:4px,color:white
-    classDef red fill:red,stroke:red,stroke-width:4px,color:white
-    classDef dkgray fill:darkgray,stroke:darkgray,stroke-width:4px,color:white
+En Prefect, un flow (flujo) es una abstracción que representa un conjunto de tareas y sus dependencias. Cada tarea ```@task``` dentro de un flujo puede ser una operación de datos, una llamada a una función de Python o cualquier otro tipo de acción ejecutable.
+
+Un ejemplo básico de un flujo en Prefect con logeo y parámetros, podría ser el siguiente:
+
+```python
+from prefect import flow, task, get_run_logger
+
+@task
+def mi_tarea(mensaje_tarea: str = ""):
+    logger = get_run_logger()
+    logger.info("Hola %s desde la tarea", mensaje_tarea)
+
+@flow
+def mi_flujo(mensaje_flujo: str = ""):
+    logger = get_run_logger()
+    logger.info("Hola %s desde el flujo", mensaje_flujo)
+    mi_tarea(mensaje_flujo)
+
+if __name__ == '__main__':
+    mi_flujo("mundo")
 ```
 
+Esto devolverá lo siguiente en terminal:
 
-## Perfiles
-Los perfiles en Prefect permiten a los usuarios configurar y almacenar ajustes específicos del entorno que se pueden activar o desactivar según sea necesario. Esto es útil para manejar diferentes configuraciones de Prefect, como puntos finales de API, configuraciones de seguridad y otras preferencias a nivel de usuario.
+```sh
+12:41:21.023 | INFO    | prefect.engine - Created flow run 'zippy-skunk' for flow 'mi-flujo'
+12:41:21.089 | INFO    | Flow run 'zippy-skunk' - Hola mundo desde el flujo
+12:41:23.244 | INFO    | Flow run 'zippy-skunk' - Created task run 'mi_tarea-0' for task 'mi_tarea'
+12:41:23.255 | INFO    | Flow run 'zippy-skunk' - Executing 'mi_tarea-0' immediately...
+12:41:23.368 | INFO    | Task run 'mi_tarea-0' - Hola mundo desde la tarea
+12:41:23.435 | INFO    | Task run 'mi_tarea-0' - Finished in state Completed()
+12:41:23.494 | INFO    | Flow run 'zippy-skunk' - Finished in state Completed('All states completed.')
+```
 
-## Deploys
-Los deploys (despliegues) son conexiones del servidor local de prefect con nuestro código. Los deploys nos permiten establecer la ubicación del script (ya sea local o en git) y configurar como se ejecutará (de manera manual, programada, por intervalos, etc). Son el paralelo a las tareas que utilizabamos en el Programador de Tareas de Windows.
+Y en la IU de Prefect se mostrará así:
 
-Los despliegues son configuraciones que definen cómo y dónde se ejecutan los flujos de trabajo de Prefect. Los deploys incluyen detalles como la ubicación del código del flujo, las variables de entorno requeridas, los comandos de ejecución y otro tipo de infraestructura necesaria para la correcta ejecución del flujo.
+![Resultados](img/resultados_basico.png)
+
+## 3.1. Subflows
+
+También se puede crear un flujo que ejecute otros flujos creando así _subflujos_.
+
+Para ejemplificar los sublujos y también mostrar como funciona la ejecución de flujos en paralelos con funciones ```async```, podemos combinar ambos en un mismo ejemplo:
+
+> [!NOTE]
+> Se puede utilizar ```async``` no solo en sublujos sino también en flujos normales y tareas.
+
+```python
+import asyncio
+from prefect import flow, task
+
+@task
+async def print_text(mensaje: str):
+    print(mensaje)
+    
+
+@flow
+async def subflow_1():
+    await print_text("Subflow 1 started!")
+    await asyncio.sleep(1)
+
+@flow
+async def subflow_2():
+    await print_text("Subflow 2 started!")
+    await asyncio.sleep(1)
+
+@flow
+async def main_flow():
+    parallel_subflows = [subflow_1(), subflow_2()]
+    await asyncio.gather(*parallel_subflows)
+
+if __name__ == "__main__":
+    main_flow_state = asyncio.run(main_flow())
+```
+
+Resultados:
+
+![Resultados subflujo](img/resultados_subflujo.png)
+
+> [!WARNING]
+    > Si bien un flujo puede ejecutar subflujos, y estos a su vez ejecutar tareas, las tareas no pueden ejecutar flujos.  
+    > Por lo tanto las tareas son **unidades atómicas y representan la más mínima expresión de trabajo en una ejecución.**
+
+# 4. Deploys
+Los deploys (despliegues) son conexiones del servidor local de prefect con nuestro código. Los deploys nos permiten establecer la ubicación del script (ya sea local o en git) y configurar como se ejecutará (de manera manual, programada, por intervalos, etc). Son el paralelo a las tareas que utilizábamos en el Programador de Tareas de Windows.
+
+Los despliegues son configuraciones que definen cómo y dónde se ejecutan los flujos de trabajo de Prefect. Incluyen detalles como la ubicación del código y los parámetros requeridos. También indican que Worker ejecutará el flujo y el tipo de infraestructura necesaria.
+
+Antes de crear un deploy se debe haber creado previamente una work pool que reciba ese deploy. Para más información visita la sección [Work Pools](#5.-Work-Pools).
 
 Crear un despliegue es sencillo y se puede hacer con el comando:
 ```prefect deploy```.
-Prefect buscará automaticamente, en los subdirectorios disponibles, scripts que posean la etiqueta ```@flow``` y que tengan un ```__main__``` configurado. Por ejemplo:
+Prefect buscará automáticamente, en los subdirectorios disponibles, scripts que posean la etiqueta ```@flow``` y que tengan un ```__main__``` configurado. Por ejemplo:
 ```python
 @flow
 def basic_flow(message="Hola mundo!"):
@@ -76,22 +128,22 @@ Y prefect nos mostrará:
     Enter a flow entrypoint manually
 ```
 
-Bastará con seleccionar el script o en caso que no se muestre para seleccionar ingresarlo manualmente:
+Bastará con seleccionar el script. En caso que no se muestre para seleccionar se deberá ingresar manualmente utilizando el formato ```directorio/al/script.py:nombre_funcion```:
 ```shell
 ? Flow entrypoint (expected format path/to/file.py:function_name): ./project/basic.py:basic_flow
 ```
 
-Luego se nos solicitaran diferentes configuraciones para el deploy:  
+Luego se nos solicitarán diferentes configuraciones para el deploy:  
 - **Nombre para el deploy:** Debe ser un nombre descriptivo. Es el equivalente al nombre de las tareas.
-- **Ejecución programada:** se puede hacer por intervalos (cada cierto tiempo) o utilizando cron ([leer sintáxis de cron](https://marquesfernandes.com/es/tecnologia-es/crontab-what-and-and-how-to-use-no-ubuntu-debian/) y [generador de cron](https://crontab.guru/#30_1,13,17_*_*_*)).
+- **Ejecución programada:** se puede hacer por intervalos (cada cierto tiempo) o utilizando cron ([leer sintaxis de cron](https://marquesfernandes.com/es/tecnologia-es/crontab-what-and-and-how-to-use-no-ubuntu-debian/) y [generador de cron](https://crontab.guru/#30_1,13,17_*_*_*)).
     - Esto puede ser configurado luego y de manera mucho más sencilla desde la UI.
     > [!TIP] 
-    > La sintáxis en cron para ejecutar en los horarios usuales (1:30, 13:30 y 17:30) es ```(30 1,13,17 * * *)```
+    > La sintaxis en cron para ejecutar en los horarios usuales (1:30, 13:30 y 17:30) es ```(30 1,13,17 * * *)```
 
     > [!CAUTION]
     > Tener en cuenta el huso horario **NO UTILIZAR "UTC".** Se debe setear en "America / Buenos Aires"
-- Luego podras elegir una Work pool para _deployar_ el flujo. Aquí apareceran las pools disponibles para el servidor actual. Para más información sobre Work Pools visita la sección [Sobre Work Pools](#sobre-work-pools).
-    > [!NOTE]
+- Luego se puede elegir una Work pool para _deployar_ el flujo. Aquí aparecerán las pools disponibles para el servidor actual.
+    > [!TIP]
     > Para cada deploy utilizar una pool coherente. Por ejemplo para un deploy de tipo **productivo** para el área **Compras** utiliza la pool ```compras-prod```.
 
 <!-- ```shell
@@ -99,52 +151,132 @@ Luego se nos solicitaran diferentes configuraciones para el deploy:
 ? Would you like to configure a schedule for this deployment? [y/n] (y): n # No configuro la ejecución automática
 ``` -->
 
-## Work Pools
+# 5. Work Pools
 
-En Prefect, los Work Pools (grupos de trabajo) son conjuntos de trabajadores que se pueden configurar para ejecutar flujos de trabajo específicos. Permiten la gestión y el dimensionamiento eficaz de los recursos disponibles para la ejecución de los trabajos en diferentes entornos, como la producción o el desarrollo.
+En Prefect, las Work Pools (grupos de trabajo) son conjuntos de _workers_ o trabajadores que se pueden configurar para ejecutar flujos de trabajo específicos. Permiten la gestión de recursos del sistema y la ejecución de los flujos.
 
-## Logeo
+Los grupos de trabajos son responsables de recibir la configuración y la información de los deploys y se encargan de monitorear y responder a nuevas ejecuciones de flujos, ya sean disparadas manualmente desde la interfaz de usuario (IU) de Prefect o mediante ejecuciones programadas previamente.
 
-Prefect tiene un adaptador de logeo
-Primero, debes importar el módulo de logging de Python y obtener una instancia de logger específico de Prefect. Luego, puedes utilizar esa instancia para registrar mensajes de log en diferentes niveles de severidad.
-python
-from prefect import task, Flow
+Para iniciar una nueva Work Pool se ejecuta el siguiente comando en terminal:
+```bash
+prefect worker start --pool my-new-pool
+```
+
+> [!NOTE]
+> Las Work Pools deben ser ejecutadas constantemente para escuchar cambios en los deploys y poder ejecutar los scripts.
+> Por lo tanto no deben manejarse desde una terminal local del usuario, sino desde un servicio de Windows. Este servicio debe arrancar al iniciarse el sistema y se crea utilizando nssm.  
+> Para crear los servicios con nssm y configurarlos ver la carpeta [/servicios](servicios).
+
+# 6. Logeo
+
+En Prefect, el logeo se maneja de una manera especial para asegurar que los logs sean coherentes y se puedan recuperar y visualizar a través de la IU. Es por esto que, aunque Prefect usa el módulo estándar de Python ```logging``` también se incluye un "logger" configurado específicamente para interactuar con Prefect.
+
+Si bien el logger de Prefect es fácil de utilizar, este no nos brinda las funcionalidades del logging estándar de Python que ya veníamos utilizando, como por ejemplo el poder guardar los registros en un archivo de log. Por lo tanto nos quedan dos opciones para el logeo:
+
+## 6.1. Logger de Prefect
+
+Este es el que ya veníamos utilizando en ejemplos anteriores y se utiliza así:
+
+```python
+from prefect import flow, task, get_run_logger
+
+@task
+def mi_tarea(mensaje_tarea: str = ""):
+    logger = get_run_logger()
+    logger.info("Hola %s desde la tarea", mensaje_tarea)
+
+@flow
+def mi_flujo(mensaje_flujo: str = ""):
+    logger = get_run_logger()
+    logger.info("Hola %s desde el flujo", mensaje_flujo)
+    mi_tarea(mensaje_flujo)
+
+if __name__ == '__main__':
+    mi_flujo("mundo")
+```
+
+## 6.2. Logger de Python
+
+Para utilizar la librería logging debemos indicarle a Prefect que también debe escuchar los logs que provienen de otros loggers además del propio.
+Es por esto que hay que configurar en Prefect un extra logger y de esta manera cuando ejecute un script este será buscado y escuchado.
+
+> [!NOTE]
+> **De la documentación:** Cuando utilizas simplemente logging sin agregarlo como un "extra logger", puedes notar que los mensajes no aparecen en la terminal. Esto sucede porque Prefect redirige y gestiona los logs a través de su propio sistema de logeo, el cual está diseñado para capturar, etiquetar y enviar los logs de la ejecución de tus flujos para su posterior visualización en la IU.
+
+Para agregar un extra logger se debe agregar una configuración al perfil actual de Prefect. Para eso se debe ejecutar en terminal lo siguiente:
+```sh
+prefect config set PREFECT_LOGGING_EXTRA_LOGGERS=custom,test
+```
+
+Esto agregará dos extra loggers "custom" y "test".
+
+Para chequear que se hayan agregado correctamente ejecutaremos:
+
+```sh
+prefect config view
+```
+
+Esto nos mostrará todas las configuraciones para el perfil actual de Prefect.
+Para más info sobre los perfiles ver [Perfiles](#7.-Perfiles)
+
+Ahora podemos usar logging normalmente:
+
+```python
 import logging
 
-### Obtiene una instancia del logger de Prefect
-logger = logging.getLogger("prefect")
+logging.basicConfig(
+    format='%(asctime)s,%(msecs)03d %(name)-8s %(levelname)-8s : %(message)s',
+    datefmt='%Y-%m-%d %H:%M:%S',
+    filename='mislogs.log',
+    encoding='utf-8',
+    filemode='a',
+    level=logging.INFO
+)
+
+# Esta linea asigna el nombre "custom" a la instancia de logger permitiendo que Prefect lo escuche 
+mylogger = logging.getLogger('custom')
+mylogger.setLevel(logging.INFO)
+
+# Se debe importar prefect luego de instanciar mylogger. Si se hace después no se detectará
+from prefect import task, flow 
 
 @task
-def tarea1():
-    # Registra un mensaje informativo
-    logger.info("Ejecutando la tarea 1")
+def mi_tarea(mensaje_tarea: str = ""):
+    mylogger.info("Hola %s desde la tarea", mensaje_tarea)
 
-@task
-def tarea2(x):
-    # Registra un mensaje de debug
-    logger.debug(f"Tarea 2 recibió el argumento: {x}")
+@flow
+def mi_flujo(mensaje_flujo: str = ""):
+    mylogger.info("Hola %s desde el flujo", mensaje_flujo)
+    mi_tarea(mensaje_flujo)
 
-    # Simula alguna validación y registra una advertencia si es necesario
-    if x < 0:
-        logger.warning("x es menor que 0; esto podría ser un problema.")
+if __name__ == '__main__':
+    mi_flujo("mundo")
+```
 
-    # Regresa algún valor
-    return x * 2
+Esta opción nos permite ver los logs de prefect y de logging combinados en la interfaz de Prefect y en la terminal, pero solo los de logging en el archivo de logs.
 
-### Define un flujo que usa ambas tareas
-with Flow("mi_flujo_de_ejemplo") as flow:
-    resultado1 = tarea1()
-    resultado2 = tarea2(resultado1)
+Las desventajas de este método son:
+* Los logs propios de Prefect no se guardarán en el archivo de logs.
+* Para que esto funcione se debe cuidar el orden de importación de las librerías de prefect. Se debe importar luego de instanciar el logger causando confusión en el uso.
+* Tendremos que configurar el logger cada vez que se escribe un script agregando lineas repetidas al código. Esto puede provocar también que el archivo de logs se encuentre en un directorio diferente del script y que haya que buscarlo cada vez que se quiera leer.
 
-### Ejecuta el flujo
-if __name__ == "__main__":
-    flow.run()
-En este ejemplo, la tarea1 registra un mensaje informativo indicando que está en ejecución. La tarea2, por otro lado, registra mensajes de depuración (debug) y advertencia (warning) dependiendo de las condiciones durante su ejecución.
-Éstos logs se mostrarán en la consola durante la ejecución del flujo y también serán accesibles a través de la UI de Prefect si estás monitoreando tus flujos en Prefect Cloud o Prefect Server.
-Recuerda configurar el nivel adecuado de logeo antes de la ejecución del flujo si necesitas más o menos detalle en tus registros. Esto se hace generalmente al comienzo de tu script:
-python
-logging.basicConfig(level=logging.INFO)
-Configurar el nivel a INFO asegurará que todos los logs INFO, WARNING, ERROR, y CRITICAL sean mostrados, pero omitirá los de DEBUG a menos que cambies el nivel a logging.DEBUG.
+---
+Ojo que hay una tercera opción, que combina la facilidad del logger de Prefect con las funcionalidades del de Python:
+
+## 6.3. Logger Personalizado
+
+En esta tercera opción utilizamos la librería ElectraCommons que posee scripts comunes a los flujos que trabajamos en Electra.
+La librería es privada y se encuentra en la organización [DesarrollosElectra](https://github.com/DesarrollosElectra/) en el siguiente link: [ElectraCommons](https://github.com/DesarrollosElectra/electracommons)  
+
+Para instalar electracommons en Python se debe tener configurado git en la terminal con una cuenta que tenga acceso a la librería. Luego se debe ejecutar lo siguiente:
+```sh
+pip install git+https://github.com/DesarrollosElectra/electracommons.git
+```
+
 
 
 Archivo logging.yml
+
+
+# 7. Perfiles
+Los perfiles en Prefect permiten a los usuarios configurar y almacenar ajustes específicos del entorno que se pueden activar o desactivar según sea necesario. Esto es útil para manejar diferentes configuraciones de Prefect, como puntos finales de API, configuraciones de seguridad y otras preferencias a nivel de usuario.
