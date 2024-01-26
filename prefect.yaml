@@ -36,7 +36,7 @@ deployments:
   tags: []
   description: "Este script permite cancelar ejecuciones de flujos atrasadas (en estado\
   \ Late) o que se encuentran corriendo (estado Running) por demasiado tiempo. \n\
-  Se pueden ajustar sus parametros para cada caso utilizando un Custom Run. \nEn caso\
+  Se pueden ajustar sus parámetros para cada caso utilizando un Custom Run. \nEn caso\
   \ que se quisiera detener todos los procesos corriendo se debe poner long_running_threshold_hours\
   \ = 0"
   entrypoint: src\watchdog\watchdog.py:watchdog
