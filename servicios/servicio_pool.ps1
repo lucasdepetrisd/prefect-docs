@@ -6,8 +6,8 @@ C:\nssm-2.24\win64\nssm.exe install "Prefect My New Pool" "C:\Users\Lucas\minico
 C:\nssm-2.24\win64\nssm.exe set "Prefect My New Pool" AppStdout "C:\Users\Lucas\OneDrive\Consulters\Electra\ElectraTest\logging_service\pool_logs\my-new-pool\stdout.log"
 C:\nssm-2.24\win64\nssm.exe set "Prefect My New Pool" AppStderr "C:\Users\Lucas\OneDrive\Consulters\Electra\ElectraTest\logging_service\pool_logs\my-new-pool\stdout.log"
 
-C:\nssm-2.24\win64\nssm.exe set "Prefect My New Pool" AppStdoutCreationDisposition 4
-C:\nssm-2.24\win64\nssm.exe set "Prefect My New Pool" AppStderrCreationDisposition 4
+C:\nssm-2.24\win64\nssm.exe set "Prefect My New Pool" AppStdoutCreationDisposition 10
+C:\nssm-2.24\win64\nssm.exe set "Prefect My New Pool" AppStderrCreationDisposition 10
 
 # C:\nssm-2.24\win64\nssm.exe set "Prefect My New Pool" AppRotateFiles 1
 # C:\nssm-2.24\win64\nssm.exe set "Prefect My New Pool" AppRotateOnline 1

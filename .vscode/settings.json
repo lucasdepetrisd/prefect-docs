@@ -5,4 +5,5 @@
     "python.analysis.extraPaths": [
         "${workspaceFolder}/commons/"
     ],
+    "cSpell.language": "en,es-ES",
 }
