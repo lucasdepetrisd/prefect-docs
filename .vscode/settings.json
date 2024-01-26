@@ -1,9 +1,9 @@
 {
-    "terminal.integrated.env.windows": {
-        "PYTHONPATH": "${workspaceFolder}/commons"
-    },
+    // "terminal.integrated.env.windows": {
+    //     "PYTHONPATH": "${workspaceFolder}/commons"
+    // },
     "python.analysis.extraPaths": [
-        "${workspaceFolder}/commons/"
+        // "${workspaceFolder}/commons/"
     ],
     "cSpell.language": "en,es-ES",
 }
