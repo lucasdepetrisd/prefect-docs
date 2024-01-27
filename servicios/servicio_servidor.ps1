@@ -4,8 +4,8 @@ C:\nssm-2.24\win64\nssm.exe install "Prefect Server" "C:\Users\Lucas\miniconda3\
 # nssm set "Prefect Server" AppDirectory "C:\service\path"
 
 # Set the AppStdout to redirect output to a log file with a timestamp
-C:\nssm-2.24\win64\nssm.exe set "Prefect Server" AppStdout "C:\Users\Lucas\OneDrive\Consulters\Electra\ElectraTest\logging_service\stdout.log"
-C:\nssm-2.24\win64\nssm.exe set "Prefect Server" AppStderr "C:\Users\Lucas\OneDrive\Consulters\Electra\ElectraTest\logging_service\stderr.log"
+C:\nssm-2.24\win64\nssm.exe set "Prefect Server" AppStdout "C:\Users\Lucas\OneDrive\Consulters\Electra\prefect-test\logging_service\stdout.log"
+C:\nssm-2.24\win64\nssm.exe set "Prefect Server" AppStderr "C:\Users\Lucas\OneDrive\Consulters\Electra\prefect-test\logging_service\stderr.log"
 
 C:\nssm-2.24\win64\nssm.exe set "Prefect Server" AppStdoutCreationDisposition 4
 C:\nssm-2.24\win64\nssm.exe set "Prefect Server" AppStderrCreationDisposition 4

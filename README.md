@@ -14,6 +14,7 @@ Documentación de Prefect adaptada a su uso en Electra.
   - [6.2. Logger de Python](#62-logger-de-python)
   - [6.3. Logger Personalizado](#63-logger-personalizado)
 - [7. Perfiles](#7-perfiles)
+- [8. Watchdog](#8-watchdog)
 
 
 # 2. Sobre Prefect
@@ -348,3 +349,11 @@ Entre las configuraciones principales de los perfiles se encuentran
 * PREFECT_LOGGING_SETTINGS_PATH='C:\Users\tareas\\.prefect\logging_new.yml' para configurar el loggeo con electracommons.log_config
 
 Se pueden agregar variables para que en el momento de la ejecución Prefect las levante y utilice esos valores de manera global.
+
+# 8. Watchdog
+
+Las ejecuciones a veces pueden quedar atascadas, la conexión se puede caer y la computadora se puede apagar, imprevistos siempre pueden surgir y para manejarlos en Prefect tenemos el Watchdog. Watchdog es un script común y corriente que se ejecuta cada 30 minutos y que se encarga de cancelar esas ejecuciones atrasadas o congeladas.
+
+Watchdog revisa ejecuciones en estado Late en las que la hora actual difiere de la hora de ejecución programada en por ejemplo 4 horas. O también ejecuciones en estado Running que estuvieron durante más de 2 horas corriendo. Este script se encarga de cambiar su estado a Canceladas para así no tener en el registro ejecuciones tardías o congeladas.
+
+Para más info visitar el script [Watchdog](src/watchdog/watchdog.py).

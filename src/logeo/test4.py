@@ -11,7 +11,7 @@ def mi_tarea(mensaje_tarea: str = ""):
     logger.info("Hola %s desde la tarea", mensaje_tarea)
     
     # Cambio el archivo de salida
-    logger = logger_global.cambiar_rotfile_handler_params(r"c:\Users\Lucas\Documents\Consulters\Electra\ElectraTest\src\logeo\logs\hola.log")
+    logger = logger_global.cambiar_rotfile_handler_params(r"c:\Users\Lucas\Documents\Consulters\Electra\prefect-test\src\logeo\logs\hola.log")
     logger.info("Tarea finalizada...")
 
 @flow

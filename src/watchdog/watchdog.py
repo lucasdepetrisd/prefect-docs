@@ -23,6 +23,9 @@ logger_prefect = PrefectLogger(__file__)
 
 CURRENT_FLOW_RUN = runtime.flow_run
 
+UI_URL = CURRENT_FLOW_RUN.ui_url
+UI_URL = UI_URL.split('/flow-run/')[0] + "/flow-run/"
+
 @task(timeout_seconds=30)
 async def find_long_running_flows(threshold_hours: float) -> list[UUID]:
     # threshold_hours = 0.0001 # Prueba para probar que no encuentre otro watchdog
@@ -47,10 +50,10 @@ async def find_long_running_flows(threshold_hours: float) -> list[UUID]:
         if CURRENT_FLOW_RUN.id == str(flow_run.id):
             filtered_flows.remove(flow_run)
             logger.info(
-                "El ID %s es el del Watchdog actual. No se cancelara.", str(flow_run.flow_id))
+                "El ID %s es el del Watchdog actual. No se cancelará.", str(flow_run.flow_id))
 
     logger.info(
-        f"Se encontraron {len(filtered_flows)} flujos de larga duracion (> {threshold_hours} horas)"
+        f"Se encontraron {len(filtered_flows)} flujos de larga duración (> {threshold_hours} horas) "
         + "\n ".join([f"{flow_run.name} ({flow_run.id})" for flow_run in filtered_flows])
     )
 
@@ -80,10 +83,10 @@ async def find_stale_flows(threshhold_hours: float) -> list[UUID]:
         if CURRENT_FLOW_RUN.id == str(flow_run.id):
             filtered_flows.remove(flow_run)
             logger.info(
-                "El ID %s es el del Watchdog actual. No se cancelara.", str(flow_run.flow_id))
+                "El ID %s es el del Watchdog actual. No se cancelará.", str(flow_run.flow_id))
 
     logger.info(
-        f"Se encontraron {len(filtered_flows)} flujos con alta demora (> {threshhold_hours} horas)"
+        f"Se encontraron {len(filtered_flows)} flujos con alta demora (> {threshhold_hours} horas) "
         + "\n ".join([f"{flow_run.name} ({flow_run.id})" for flow_run in filtered_flows])
     )
 
@@ -94,18 +97,21 @@ async def find_stale_flows(threshhold_hours: float) -> list[UUID]:
 async def cancel_flow_runs(flow_run_id: UUID):
     logger = logger_prefect.obtener_logger_prefect()
 
+    url_current_flow = CURRENT_FLOW_RUN.ui_url
+    url_cancelled_flow = UI_URL + str(flow_run_id)
+
     state = State(type=StateType.CANCELLED,
-                    message="Cancelado por watchdog debido a alta duracion")
+                    message=f"Cancelado por watchdog debido a alta duración.Visita el siguiente enlace para más información\n{url_current_flow}")
 
     async with get_client() as client:
 
         logger.info("Cancelando flujo de ID: %s", flow_run_id)
-        await send_log(client, flow_run_id, f"Se cancelara la ejecucion por Watchdog con ID: {CURRENT_FLOW_RUN.id}")
+        await send_log(client, flow_run_id, f"Se cancelará la ejecución por Watchdog con ID: {CURRENT_FLOW_RUN.id}.Visita el siguiente enlace para más información:\n{url_current_flow}")
 
         result_state = await client.set_flow_run_state(flow_run_id, state, force=True)
 
         if str(result_state.status) == 'SetStateStatus.ACCEPT':
-            logger.info("Flujo cancelado de ID: %s", flow_run_id)
+            logger.info("Flujo cancelado de ID: %s. Visita el siguiente enlace para más información\n%s", flow_run_id, url_cancelled_flow)
             await send_log(client, flow_run_id, f"Ejecucion cancelada por Watchdog con ID: {CURRENT_FLOW_RUN.id}")
 
 

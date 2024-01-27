@@ -36,7 +36,7 @@ infrastructure:
 flow_name: Watchdog
 manifest_path: null
 storage: null
-path: C:\Users\Lucas\OneDrive\Consulters\Electra\ElectraTest
+path: C:\Users\Lucas\OneDrive\Consulters\Electra\prefect-test
 entrypoint: src\watchdog\watchdog.py:watchdog
 parameter_openapi_schema:
   title: Parameters

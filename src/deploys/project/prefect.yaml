@@ -15,7 +15,7 @@ push:
 # pull section allows you to provide instructions for cloning this project in remote locations
 pull:
 - prefect.deployments.steps.set_working_directory:
-    directory: C:\Users\Lucas\OneDrive\Consulters\Electra\ElectraTest\src\deploys\project
+    directory: C:\Users\Lucas\OneDrive\Consulters\Electra\prefect-test\src\deploys\project
 
 # the deployments section allows you to provide configuration for deploying flows
 deployments:

@@ -1,4 +1,4 @@
-$filePath = "C:\Users\Lucas\OneDrive\Consulters\Electra\ElectraTest\logging_service\stdout.log"
+$filePath = "C:\Users\Lucas\OneDrive\Consulters\Electra\prefect-test\logging_service\stdout.log"
 
 # Get the last modified date of the file
 $lastModified = (Get-Item $filePath).LastWriteTime

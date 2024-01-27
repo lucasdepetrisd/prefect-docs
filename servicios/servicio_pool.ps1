@@ -3,8 +3,8 @@ C:\nssm-2.24\win64\nssm.exe install "Prefect My New Pool" "C:\Users\Lucas\minico
 
 # nssm set "Prefect My New Pool" AppDirectory "C:\service\path"
 
-C:\nssm-2.24\win64\nssm.exe set "Prefect My New Pool" AppStdout "C:\Users\Lucas\OneDrive\Consulters\Electra\ElectraTest\logging_service\pool_logs\my-new-pool\stdout.log"
-C:\nssm-2.24\win64\nssm.exe set "Prefect My New Pool" AppStderr "C:\Users\Lucas\OneDrive\Consulters\Electra\ElectraTest\logging_service\pool_logs\my-new-pool\stdout.log"
+C:\nssm-2.24\win64\nssm.exe set "Prefect My New Pool" AppStdout "C:\Users\Lucas\OneDrive\Consulters\Electra\prefect-test\logging_service\pool_logs\my-new-pool\stdout.log"
+C:\nssm-2.24\win64\nssm.exe set "Prefect My New Pool" AppStderr "C:\Users\Lucas\OneDrive\Consulters\Electra\prefect-test\logging_service\pool_logs\my-new-pool\stdout.log"
 
 C:\nssm-2.24\win64\nssm.exe set "Prefect My New Pool" AppStdoutCreationDisposition 10
 C:\nssm-2.24\win64\nssm.exe set "Prefect My New Pool" AppStderrCreationDisposition 10

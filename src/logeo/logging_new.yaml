@@ -87,7 +87,7 @@ handlers:
     # file:
     #     level: 0
     #     class: logging.handlers.TimedRotatingFileHandler
-    #     filename: C:\Users\Lucas\OneDrive\Consulters\Electra\ElectraTest\src\logs\log_prefect.log
+    #     filename: C:\Users\Lucas\OneDrive\Consulters\Electra\prefect-test\src\logs\log_prefect.log
     #     when: 'W0'
     #     interval: 1
     #     backupCount: 12 # Mantengo las ultimas 12 semanas
