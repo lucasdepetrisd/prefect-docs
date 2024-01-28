@@ -1,7 +1,7 @@
 import openpyxl
 from openpyxl.styles import Font, Alignment, numbers, Border, Side
 import os
-from commons.log_config import FILE_PATH
+from electracommons.log_config import obtener_path_script
 
 # Crear un nuevo libro de trabajo y una hoja de cálculo
 wb = openpyxl.Workbook()
@@ -36,6 +36,6 @@ for fila in ws:
 
 # Guardar el libro de trabajo en el directorio del script
 nombre_archivo = 'datos_excel.xlsx'
-wb.save(os.path.join(FILE_PATH, nombre_archivo))
+wb.save(os.path.join(obtener_path_script(__file__), nombre_archivo))
 
 print(f'El archivo {nombre_archivo} ha sido creado y guardado en el directorio del script.')
