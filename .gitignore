@@ -15,6 +15,10 @@ prodenv
 /prod/**/*log_*.txt
 /prod/**/*log_*.log
 
+# Para archivos NOMBRE.log.YYYY-MM-DD
+*.log.*
+*.log
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -73,7 +77,6 @@ cover/
 *.pot
 
 # Django stuff:
-*.log
 local_settings.py
 db.sqlite3
 db.sqlite3-journal
