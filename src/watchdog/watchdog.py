@@ -1,5 +1,6 @@
 # watchdog.py
 
+import os
 import asyncio
 from datetime import datetime, timedelta, timezone
 from uuid import UUID
@@ -21,10 +22,8 @@ from electracommons.log_config import PrefectLogger
 
 logger_prefect = PrefectLogger(__file__)
 
-CURRENT_FLOW_RUN = runtime.flow_run
-
-UI_URL = CURRENT_FLOW_RUN.ui_url
-UI_URL = UI_URL.split('/flow-run/')[0] + "/flow-run/"
+CURRENT_FLOW_RUN = None
+UI_URL = ""
 
 @task(timeout_seconds=30)
 async def find_long_running_flows(threshold_hours: float) -> list[UUID]:
@@ -99,20 +98,26 @@ async def cancel_flow_runs(flow_run_id: UUID):
 
     url_current_flow = CURRENT_FLOW_RUN.ui_url
     url_cancelled_flow = UI_URL + str(flow_run_id)
+    msg_visita = "Visita el siguiente enlace para más información\n"
 
     state = State(type=StateType.CANCELLED,
-                    message=f"Cancelado por watchdog debido a alta duración.Visita el siguiente enlace para más información\n{url_current_flow}")
+                  message=f"Cancelado por watchdog debido a alta duracion. {msg_visita}{url_current_flow}")
 
     async with get_client() as client:
 
         logger.info("Cancelando flujo de ID: %s", flow_run_id)
-        await send_log(client, flow_run_id, f"Se cancelará la ejecución por Watchdog con ID: {CURRENT_FLOW_RUN.id}.Visita el siguiente enlace para más información:\n{url_current_flow}")
+
+        flow_run_to_cancel = await client.read_flow_run(flow_run_id)
+        await send_log(client, flow_run_id, f"Se cancelará la ejecución por Watchdog con ID: {CURRENT_FLOW_RUN.id}. {msg_visita}{url_current_flow}")
 
         result_state = await client.set_flow_run_state(flow_run_id, state, force=True)
 
         if str(result_state.status) == 'SetStateStatus.ACCEPT':
-            logger.info("Flujo cancelado de ID: %s. Visita el siguiente enlace para más información\n%s", flow_run_id, url_cancelled_flow)
+            logger.info("Flujo cancelado de ID: %s. %s%s", flow_run_id, msg_visita, url_cancelled_flow)
             await send_log(client, flow_run_id, f"Ejecucion cancelada por Watchdog con ID: {CURRENT_FLOW_RUN.id}")
+            
+            await client.update_flow_run(flow_run_id=CURRENT_FLOW_RUN.id, tags=list(CURRENT_FLOW_RUN.tags + ["Cancelo un flow"]))
+            await client.update_flow_run(flow_run_id=flow_run_id, tags=list(flow_run_to_cancel.tags + ["Cancelado por Watchdog"]))
 
 
 async def send_log(client: PrefectClient, flow_run_id: UUID, message: str):
@@ -136,7 +141,13 @@ async def send_log(client: PrefectClient, flow_run_id: UUID, message: str):
 
 @flow(name="Watchdog")#, timeout_seconds=60)
 async def watchdog(stale_threshold_hours: float = 12, long_running_threshold_hours: float = 1):
-    logger_prefect.obtener_logger_prefect()
+    logger = logger_prefect.obtener_logger_prefect()
+
+    global CURRENT_FLOW_RUN # pylint: disable=global-statement
+    CURRENT_FLOW_RUN = runtime.flow_run # pylint: disable=redefined-outer-name, invalid-name
+    global UI_URL # pylint: disable=global-statement
+    UI_URL = os.path.dirname(CURRENT_FLOW_RUN.ui_url) + "/" if CURRENT_FLOW_RUN.ui_url is not None else 'http://127.0.0.2:5000/flow-runs/flow-run/'  # pylint: disable=redefined-outer-name, invalid-name
+
     # logger.info("----------------------------------")
 
     # Obtengo la diferencia de tiempo entre que se programó y empezó
@@ -154,9 +165,16 @@ async def watchdog(stale_threshold_hours: float = 12, long_running_threshold_hou
             long_running_flows = await find_long_running_flows(long_running_threshold_hours)
             await cancel_flow_runs.map(long_running_flows)
         else:
-            return Cancelled(message="El flujo estaba demorado por lo que se canceló.")
+            logger.info("El flujo estaba demorado por lo que se canceló.")
+            return Cancelled(message="El flujo estaba demorado por lo que se cancelo.")
     except asyncio.TimeoutError:
-        return Cancelled(message="Se superó el límite de tiempo y se detendrá la ejecución")
+        logger.info("Se superó el límite de tiempo y se detendrá la ejecución")
+        return Cancelled(message="Se supero el limite de tiempo y se detendra la ejecucion")
+    except UnicodeDecodeError as e:
+        logger.info("Se produjo un error Unicode:\n%s", e)
+    except Exception as e:  # pylint: disable=broad-exception-caught
+        logger.info("Se produjo un error:\n%s", e)
+        return Cancelled(message=f"Se produjo un error: {e}")
 
 if __name__ == "__main__":
     asyncio.run(watchdog())
