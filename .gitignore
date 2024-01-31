@@ -5,9 +5,18 @@
 *.xlsm
 *.pbix
 
-# Entornos
-devenv
-prodenv
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Entornos locales
+devenv/
+prodenv/
 
 # Logs
 # Ignora archivos para cualquier directorio de produccion 
@@ -135,15 +144,6 @@ celerybeat.pid
 
 # SageMath parsed files
 *.sage.py
-
-# Environments
-.env
-.venv
-env/
-venv/
-ENV/
-env.bak/
-venv.bak/
 
 # Spyder project settings
 .spyderproject
