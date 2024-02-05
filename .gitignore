@@ -5,15 +5,28 @@
 *.xlsm
 *.pbix
 
-# Entornos
-devenv
-prodenv
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Entornos locales
+devenv/
+prodenv/
 
 # Logs
 # Ignora archivos para cualquier directorio de produccion 
 # con "logs_" en su nombre y que terminen en .txt
 /prod/**/*log_*.txt
 /prod/**/*log_*.log
+
+# Para archivos NOMBRE.log.YYYY-MM-DD
+*.log.*
+*.log
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -73,7 +86,6 @@ cover/
 *.pot
 
 # Django stuff:
-*.log
 local_settings.py
 db.sqlite3
 db.sqlite3-journal
@@ -135,15 +147,6 @@ celerybeat.pid
 
 # SageMath parsed files
 *.sage.py
-
-# Environments
-.env
-.venv
-env/
-venv/
-ENV/
-env.bak/
-venv.bak/
 
 # Spyder project settings
 .spyderproject
