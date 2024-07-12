@@ -13,7 +13,7 @@ Documentación de Prefect.
   - [6.1. Logger de Prefect](#61-logger-de-prefect)
   - [6.2. Logger de Python](#62-logger-de-python)
   - [6.3. Logger Personalizado](#63-logger-personalizado)
-- [[Prefect#7. Perfiles|7. Perfiles]]
+- [7. Perfiles](#7-perfiles)
 - [8. Watchdog](#8-watchdog)
 
 # 2. Sobre Prefect
@@ -24,7 +24,7 @@ A diferencia de otros orquestadores, Prefect se esfuerza por ser lo menos invasi
 
 Esta plataforma sigue la idea de "[code as workflows](https://www.prefect.io/blog/prefect-global-coordination-plane#:~:text=Code%20as%20Workflows%3A%20The%20Python%20API)". Esto significa que cualquier función puede convertirse fácilmente en un flujo Prefect simplemente agregando un decorador ```@flow```. Este enfoque nos brinda acceso instantáneo a características como la gestión de errores, los reintentos automáticos, programación de la ejecución y una interfaz de usuario intuitiva para monitorear y controlar nuestros flujos de trabajo.
 
-![Funcionamiento de Prefect](funcionamiento_prefect.png)
+![Funcionamiento de Prefect](img/funcionamiento_prefect.png)
 *Funcionamiento de Prefect: Este diagrama muestra el flujo de trabajo en Prefect, la definición del código, el despliegue y la ejecución en el servidor.*
 
 # 3. Flows
@@ -65,7 +65,7 @@ Esto devolverá lo siguiente en terminal:
 
 Y en la IU de Prefect se mostrará así:
 
-![Resultados](resultados_basico.png)
+![Resultados](img/resultados_basico.png)
 
 ## 3.1. Subflows
 
@@ -73,7 +73,7 @@ También se puede crear un flujo que ejecute otros flujos creando así _subflujo
 
 Para ejemplificar los sublujos y también mostrar como funciona la ejecución de flujos en paralelos con funciones ```async```, podemos combinar ambos en un mismo ejemplo:
 
-> [!example]
+> [!NOTE]
 > Se puede utilizar ```async``` no solo en sublujos sino también en flujos normales y tareas.
 
 ```python
@@ -106,13 +106,13 @@ if __name__ == "__main__":
 
 Resultados:
 
-![Resultados subflujo](resultados_subflujo.png)
+![Resultados subflujo](img/resultados_subflujo.png)
 
-> [!help] Sobre subflujos
-> Si bien un flujo puede ejecutar subflujos, y estos a su vez ejecutar tareas, las tareas no pueden ejecutar flujos.  
-> Por lo tanto las tareas son **unidades atómicas y representan la más mínima expresión de trabajo en una ejecución.** 
+> [!IMPORTANT]
+> Si bien un flujo puede ejecutar subflujos, y estos a su vez ejecutar tareas, las tareas no pueden ejecutar flujos ni otras tareas.  
+> Por lo tanto las tareas son **unidades atómicas y representan la más mínima expresión de trabajo en una ejecución.**
 > 
-> ***Esto cambio a partir de Prefect 2.18. Ahora las tareas pueden ejecutar otras tareas, flujos otros flujos y tareas ejecutar flujos.***
+> ***Esto cambio a partir de Prefect 2.18.x. Ahora las tareas pueden ejecutar otras tareas y flujos otros flujos.***
 
 # 4. Deploys
 Los deploys (despliegues) son conexiones del servidor local de prefect con nuestro código. Los deploys nos permiten establecer la ubicación del script (ya sea local o en git) y configurar como se ejecutará (de manera manual, programada, por intervalos, etc). Son el paralelo a las tareas que utilizábamos en el Programador de Tareas de Windows.
@@ -164,7 +164,7 @@ Luego se nos solicitarán diferentes configuraciones para el deploy:
 - Luego se puede elegir una Work pool para _deployar_ el flujo. Aquí aparecerán las pools disponibles para el servidor actual.
 
 > [!TIP]
-> Para cada deploy utilizar una pool coherente. Por ejemplo para un deploy de tipo **productivo** para el área **Compras** utiliza la pool ```compras-prod```.
+> Para cada deploy utilizar una pool coherente. Por ejemplo para un deploy de tipo **productivo** utilizá la pool ```pool-prod```.
 
 <!-- ```shell
 ? Deployment name (default): printear-mensaje # Ingreso un nombre para el deploy.
@@ -326,15 +326,15 @@ if __name__ == '__main__':
 
 Resultado en terminal:
 
-![Alt text](result_logging.png)
+![Alt text](img/result_logging.png)
 
 Resultado en archivo de log test.log:
 
-![Alt text](result_logfile.png)
+![Alt text](img/result_logfile.png)
 
 Resultado en IU:
 
-![Alt text](result_iu.png)
+![Alt text](img/result_iu.png)
 
 La clase ```PrefectLogger``` tiene un método ```cambiar_rotfile_handler_params```, en el que podemos cambiarle parámetros del manejador de logs para una tarea o flujo especifico, como por ejemplo la ubicación del archivo de logeo o el formato. Para más info leer la documentación de [ElectraCommons](https://github.com/DesarrollosElectra/electracommons)  
 
