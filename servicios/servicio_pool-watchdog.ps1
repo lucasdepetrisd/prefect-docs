@@ -4,7 +4,8 @@
 
 C:\nssm-2.24\win64\nssm.exe stop prefpoolwd # Detener en caso que este funcionando
 
-C:\nssm-2.24\win64\nssm.exe install prefpoolwd C:\Reportes_Power_BI\Python\virtualenvs\devenv\Scripts\prefect.exe worker start --pool watchdog-pool
+# C:\nssm-2.24\win64\nssm.exe install prefpoolwd C:\Reportes_Power_BI\Python\virtualenvs\devenv\Scripts\prefect.exe worker start --pool watchdog-pool
+C:\nssm-2.24\win64\nssm.exe install prefpoolwd "C:\Users\Lucas\miniconda3\envs\electraenv\Scripts\prefect.exe" worker start --pool watchdog-pool
 C:\nssm-2.24\win64\nssm.exe set prefpoolwd DisplayName "Prefect Pool - Watchdog"
 # nssm set "Prefect Watchdog Pool" AppDirectory "C:\service\path"
 
@@ -18,14 +19,14 @@ C:\nssm-2.24\win64\nssm.exe set prefpoolwd Description "Pool de ejecuciones para
 #* Set usuario tareas
 #* --------------------------------------------------------------
 
-C:\nssm-2.24\win64\nssm.exe set prefpoolwd ObjectName SRVPWBGW\tareas Tar34s23
+# C:\nssm-2.24\win64\nssm.exe set prefpoolwd ObjectName SRVPWBGW\tareas Tar34s23
 
 # --------------------------------------------------------------
 # Set directorios logeo
 # --------------------------------------------------------------
 
-C:\nssm-2.24\win64\nssm.exe set prefpoolwd AppStdout C:\Reportes_Power_BI\Python\logs_services\pools\pool-dev\stdout.log
-C:\nssm-2.24\win64\nssm.exe set prefpoolwd AppStderr C:\Reportes_Power_BI\Python\logs_services\pools\pool-dev\stderr.log
+C:\nssm-2.24\win64\nssm.exe set prefpoolwd AppStdout C:\Users\Lucas\Documents\Consulters\Electra\Python\prefect-test\logs_services\pools\pool-watchdog\stdout.log
+C:\nssm-2.24\win64\nssm.exe set prefpoolwd AppStderr C:\Users\Lucas\Documents\Consulters\Electra\Python\prefect-test\logs_services\pools\pool-watchdog\stderr.log
 
 # --------------------------------------------------------------
 # Set tipo de creacion de archivos de logeo. 4 = OPEN_ALWAYS. Crear si no se encontro y append al final

@@ -1,4 +1,6 @@
-# watchdog.py
+"""
+Script de monitoreo para detener ejecuciones congeladas o pausadas.
+"""
 
 import os
 import asyncio
@@ -49,10 +51,12 @@ async def find_long_running_flows(threshold_hours: float) -> list[UUID]:
         if CURRENT_FLOW_RUN.id == str(flow_run.id):
             filtered_flows.remove(flow_run)
             logger.info(
-                "El ID %s es el del Watchdog actual. No se cancelará.", str(flow_run.flow_id))
+                # "El ID %s es el del Watchdog actual. No se cancelará.", str(flow_run.flow_id))
+                "El ID %s es el del Watchdog actual. No se cancelara.", str(flow_run.flow_id))
 
     logger.info(
-        f"Se encontraron {len(filtered_flows)} flujos de larga duración (> {threshold_hours} horas) "
+        # f"Se encontraron {len(filtered_flows)} flujos de larga duración (> {threshold_hours} horas) "
+        f"Se encontraron {len(filtered_flows)} flujos de larga duracion (> {threshold_hours} horas) "
         + "\n ".join([f"{flow_run.name} ({flow_run.id})" for flow_run in filtered_flows])
     )
 
@@ -82,7 +86,8 @@ async def find_stale_flows(threshhold_hours: float) -> list[UUID]:
         if CURRENT_FLOW_RUN.id == str(flow_run.id):
             filtered_flows.remove(flow_run)
             logger.info(
-                "El ID %s es el del Watchdog actual. No se cancelará.", str(flow_run.flow_id))
+                # "El ID %s es el del Watchdog actual. No se cancelará.", str(flow_run.flow_id))
+                "El ID %s es el del Watchdog actual. No se cancelara.", str(flow_run.flow_id))
 
     logger.info(
         f"Se encontraron {len(filtered_flows)} flujos con alta demora (> {threshhold_hours} horas) "
@@ -98,7 +103,8 @@ async def cancel_flow_runs(flow_run_id: UUID):
 
     url_current_flow = CURRENT_FLOW_RUN.ui_url
     url_cancelled_flow = UI_URL + str(flow_run_id)
-    msg_visita = "Visita el siguiente enlace para más información\n"
+    # msg_visita = "Visita el siguiente enlace para más información\n"
+    msg_visita = "Visita el siguiente enlace para mas informacion\n"
 
     state = State(type=StateType.CANCELLED,
                   message=f"Cancelado por watchdog debido a alta duracion. {msg_visita}{url_current_flow}")
@@ -108,14 +114,15 @@ async def cancel_flow_runs(flow_run_id: UUID):
         logger.info("Cancelando flujo de ID: %s", flow_run_id)
 
         flow_run_to_cancel = await client.read_flow_run(flow_run_id)
-        await send_log(client, flow_run_id, f"Se cancelará la ejecución por Watchdog con ID: {CURRENT_FLOW_RUN.id}. {msg_visita}{url_current_flow}")
+        # await send_log(client, flow_run_id, f"Se cancelará la ejecución por Watchdog con ID: {CURRENT_FLOW_RUN.id}. {msg_visita}{url_current_flow}")
+        await send_log(client, flow_run_id, f"Se cancelara la ejecucion por Watchdog con ID: {CURRENT_FLOW_RUN.id}. {msg_visita}{url_current_flow}")
 
         result_state = await client.set_flow_run_state(flow_run_id, state, force=True)
 
         if str(result_state.status) == 'SetStateStatus.ACCEPT':
             logger.info("Flujo cancelado de ID: %s. %s%s", flow_run_id, msg_visita, url_cancelled_flow)
             await send_log(client, flow_run_id, f"Ejecucion cancelada por Watchdog con ID: {CURRENT_FLOW_RUN.id}")
-            
+
             await client.update_flow_run(flow_run_id=CURRENT_FLOW_RUN.id, tags=list(CURRENT_FLOW_RUN.tags + ["Cancelo un flow"]))
             await client.update_flow_run(flow_run_id=flow_run_id, tags=list(flow_run_to_cancel.tags + ["Cancelado por Watchdog"]))
 
@@ -165,10 +172,12 @@ async def watchdog(stale_threshold_hours: float = 12, long_running_threshold_hou
             long_running_flows = await find_long_running_flows(long_running_threshold_hours)
             await cancel_flow_runs.map(long_running_flows)
         else:
-            logger.info("El flujo estaba demorado por lo que se canceló.")
+            # logger.info("El flujo estaba demorado por lo que se cancelo.")
+            logger.info("El flujo estaba demorado por lo que se cancelo.")
             return Cancelled(message="El flujo estaba demorado por lo que se cancelo.")
     except asyncio.TimeoutError:
-        logger.info("Se superó el límite de tiempo y se detendrá la ejecución")
+        # logger.info("Se superó el límite de tiempo y se detendrá la ejecución")
+        logger.info("Se supero el limite de tiempo y se detendra la ejecucion")
         return Cancelled(message="Se supero el limite de tiempo y se detendra la ejecucion")
     except UnicodeDecodeError as e:
         logger.info("Se produjo un error Unicode:\n%s", e)
