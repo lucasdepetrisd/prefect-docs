@@ -347,6 +347,7 @@ Entre las configuraciones principales de los perfiles se encuentran
 
 * PREFECT_API_URL='http://127.0.0.2:5000/api' para indicar que las ejecuciones y deploys se dirijan a esa URL.
 * PREFECT_LOGGING_SETTINGS_PATH='C:\Users\tareas\\.prefect\logging_new.yml' para configurar el loggeo con electracommons.log_config
+* $env:PREFECT_HOME = 'C:\Users\tareas\.prefect'
 
 Se pueden agregar variables para que en el momento de la ejecución Prefect las levante y utilice esos valores de manera global.
 
