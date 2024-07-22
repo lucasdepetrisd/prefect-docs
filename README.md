@@ -1,5 +1,5 @@
 # 1. Documentación de Prefect
-Documentación de Prefect adaptada a su uso en Electra.
+Documentación de Prefect.
 
 ## Tabla de contenidos
 - [1. Documentación de Prefect](#1-documentación-de-prefect)
@@ -15,7 +15,6 @@ Documentación de Prefect adaptada a su uso en Electra.
   - [6.3. Logger Personalizado](#63-logger-personalizado)
 - [7. Perfiles](#7-perfiles)
 - [8. Watchdog](#8-watchdog)
-
 
 # 2. Sobre Prefect
 
@@ -109,9 +108,11 @@ Resultados:
 
 ![Resultados subflujo](img/resultados_subflujo.png)
 
-> [!WARNING]
-> Si bien un flujo puede ejecutar subflujos, y estos a su vez ejecutar tareas, las tareas no pueden ejecutar flujos.  
+> [!IMPORTANT]
+> Si bien un flujo puede ejecutar subflujos, y estos a su vez ejecutar tareas, las tareas no pueden ejecutar flujos ni otras tareas.  
 > Por lo tanto las tareas son **unidades atómicas y representan la más mínima expresión de trabajo en una ejecución.**
+> 
+> ***Esto cambio a partir de Prefect 2.18.x. Ahora las tareas pueden ejecutar otras tareas y flujos otros flujos.***
 
 # 4. Deploys
 Los deploys (despliegues) son conexiones del servidor local de prefect con nuestro código. Los deploys nos permiten establecer la ubicación del script (ya sea local o en git) y configurar como se ejecutará (de manera manual, programada, por intervalos, etc). Son el paralelo a las tareas que utilizábamos en el Programador de Tareas de Windows.
@@ -152,21 +153,23 @@ Bastará con seleccionar el script. En caso que no se muestre para seleccionar s
 Luego se nos solicitarán diferentes configuraciones para el deploy:  
 - **Nombre para el deploy:** Debe ser un nombre descriptivo. Es el equivalente al nombre de las tareas.
 - **Ejecución programada:** se puede hacer por intervalos (cada cierto tiempo) o utilizando cron ([leer sintaxis de cron](https://marquesfernandes.com/es/tecnologia-es/crontab-what-and-and-how-to-use-no-ubuntu-debian/) y [generador de cron](https://crontab.guru/#30_1,13,17_*_*_*)).
-    - Esto puede ser configurado luego y de manera mucho más sencilla desde la UI.
-    > [!TIP] 
-    > La sintaxis en cron para ejecutar en los horarios usuales (1:30, 13:30 y 17:30) es ```(30 1,13,17 * * *)```
+    - Esto puede ser configurado luego y de manera mucho más sencilla desde la UI..
+ 
+> [!TIP] 
+> La sintaxis en cron para ejecutar en los horarios usuales (1:30, 13:30 y 17:30) es ```(30 1,13,17 * * *)```
 
-    > [!CAUTION]
-    > Tener en cuenta el huso horario **NO UTILIZAR "UTC".** Se debe setear en "America / Buenos Aires"
+> [!CAUTION]
+> Tener en cuenta el huso horario **NO UTILIZAR "UTC".** Se debe setear en "America / Buenos Aires"
+
 - Luego se puede elegir una Work pool para _deployar_ el flujo. Aquí aparecerán las pools disponibles para el servidor actual.
-    > [!TIP]
-    > Para cada deploy utilizar una pool coherente. Por ejemplo para un deploy de tipo **productivo** para el área **Compras** utiliza la pool ```compras-prod```.
+
+> [!TIP]
+> Para cada deploy utilizar una pool coherente. Por ejemplo para un deploy de tipo **productivo** utilizá la pool ```pool-prod```.
 
 <!-- ```shell
 ? Deployment name (default): printear-mensaje # Ingreso un nombre para el deploy.
 ? Would you like to configure a schedule for this deployment? [y/n] (y): n # No configuro la ejecución automática
 ``` -->
-
 # 5. Work Pools
 
 En Prefect, las Work Pools (grupos de trabajo) son conjuntos de _workers_ o trabajadores que se pueden configurar para ejecutar flujos de trabajo específicos. Permiten la gestión de recursos del sistema y la ejecución de los flujos.
@@ -233,7 +236,7 @@ prefect config view
 ```
 
 Esto nos mostrará todas las configuraciones para el perfil actual de Prefect.
-Para más info sobre los perfiles ver [Perfiles](#7.-Perfiles)
+Para más info sobre los perfiles ver [Perfiles](#7. Perfiles)
 
 Ahora podemos usar logging normalmente:
 
@@ -285,6 +288,7 @@ En esta tercera opción utilizamos la librería ElectraCommons que posee scripts
 La librería es privada y se encuentra en la organización [DesarrollosElectra](https://github.com/DesarrollosElectra/) en el siguiente link: [ElectraCommons](https://github.com/DesarrollosElectra/electracommons)  
 
 Para instalar electracommons en Python se debe tener configurado git en la terminal con una cuenta que tenga acceso a la librería. Luego se debe ejecutar lo siguiente:
+
 ```sh
 pip install git+https://github.com/DesarrollosElectra/electracommons.git
 ```
