@@ -4,7 +4,7 @@ import os
 
 # print("PYTHONPATH:" + os.getenv("PYTHONPATH"))
 
-# from electracommons.log_config import CALLER_SCRIPT_PATH, FILE_PATH, PrefectLogger
+# from consulterscommons.log_tools.prefect_log_config import CALLER_SCRIPT_PATH, FILE_PATH, PrefectLogger
 
 # logger_prefect = PrefectLogger()
 

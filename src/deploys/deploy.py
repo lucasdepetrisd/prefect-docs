@@ -1,6 +1,7 @@
 from prefect import flow, task
 
-from electracommons.log_config import PrefectLogger, obtener_path_script
+from consulterscommons.log_tools import PrefectLogger
+from consulterscommons.log_tools.prefect_log_config import obtener_path_script
 
 logger_prefect = PrefectLogger(__file__)
 
@@ -19,6 +20,15 @@ def my_flow():
 
 
 if __name__ == '__main__':
-    my_flow.serve(name="my-second-deployment",
-                   tags=["testing"])
+    # my_flow.serve(name="my-second-deployment",
+    #                tags=["testing"])
+    my_flow.from_source(
+        source="C:/Users/Lucas/Documents/Consulters/Electra/Python/prefect-test",
+        entrypoint="src/deploys/deploy.py:my_flow",
+    ).deploy(
+        name="deploys-deploy",
+        work_pool_name="pool-dev",
+        ignore_warnings=True,
+        tags=["testing"]
+    )
     # my_flow()

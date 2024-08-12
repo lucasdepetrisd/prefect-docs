@@ -284,13 +284,13 @@ Ojo que hay una tercera opción, que combina la facilidad del logger de Prefect 
 
 ## 6.3. Logger Personalizado
 
-En esta tercera opción utilizamos la librería ElectraCommons que posee scripts comunes a los flujos que trabajamos en Electra.
-La librería es privada y se encuentra en la organización [DesarrollosElectra](https://github.com/DesarrollosElectra/) en el siguiente link: [ElectraCommons](https://github.com/DesarrollosElectra/electracommons)  
+En esta tercera opción utilizamos la librería ConsultersCommons que posee scripts comunes a los flujos que trabajamos en Electra.
+La librería es privada y se encuentra en la organización [Technological Consulters](https://github.com/Technological-Consulters/) en el siguiente link: [ConsultersCommons](https://github.com/Technological-Consulters/consulterscommons)  
 
-Para instalar electracommons en Python se debe tener configurado git en la terminal con una cuenta que tenga acceso a la librería. Luego se debe ejecutar lo siguiente:
+Para instalar ConsultersCommons en Python se debe tener configurado git en la terminal con una cuenta que tenga acceso a la librería. Luego se debe ejecutar lo siguiente:
 
 ```sh
-pip install git+https://github.com/DesarrollosElectra/electracommons.git
+pip install git+https://github.com/Technological-Consulters/consulterscommons.git
 ```
 
 Una vez instalada la librería se llama como al logger de Prefect pero con la diferencia de que genera un archivo de logs con todos los registros y también logea correctamente en la IU de Prefect.
@@ -300,7 +300,7 @@ Ejemplo de uso:
 ```python
 from prefect import flow, task
 
-from electracommons.log_config import PrefectLogger
+from consulterscommons.log_tools import PrefectLogger
 
 logger_global = PrefectLogger(__file__)
 
@@ -336,7 +336,7 @@ Resultado en IU:
 
 ![Alt text](img/result_iu.png)
 
-La clase ```PrefectLogger``` tiene un método ```cambiar_rotfile_handler_params```, en el que podemos cambiarle parámetros del manejador de logs para una tarea o flujo especifico, como por ejemplo la ubicación del archivo de logeo o el formato. Para más info leer la documentación de [ElectraCommons](https://github.com/DesarrollosElectra/electracommons)  
+La clase ```PrefectLogger``` tiene un método ```cambiar_rotfile_handler_params```, en el que podemos cambiarle parámetros del manejador de logs para una tarea o flujo especifico, como por ejemplo la ubicación del archivo de logeo o el formato. Para más info leer la documentación de [ConsultersCommons](https://github.com/Technological-Consulters/consulterscommons)  
 
 Para que esto funcione correctamente el archivo de configuración del logeo de Prefect ```logging_new.yml``` que se encuentra en este repositorio debe estar correctamente configurado y seteado:
 
@@ -350,7 +350,7 @@ Los perfiles en Prefect permiten a los usuarios configurar y almacenar ajustes e
 Entre las configuraciones principales de los perfiles se encuentran
 
 * PREFECT_API_URL='http://127.0.0.2:5000/api' para indicar que las ejecuciones y deploys se dirijan a esa URL.
-* PREFECT_LOGGING_SETTINGS_PATH='C:\Users\tareas\\.prefect\logging_new.yml' para configurar el loggeo con electracommons.log_config
+* PREFECT_LOGGING_SETTINGS_PATH='C:\Users\tareas\\.prefect\logging_new.yml' para configurar el loggeo con consulterscommons.log_tools
 * $env:PREFECT_HOME = 'C:\Users\tareas\.prefect'
 
 Se pueden agregar variables para que en el momento de la ejecución Prefect las levante y utilice esos valores de manera global.

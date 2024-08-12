@@ -2,7 +2,7 @@ from prefect import task, flow
 from datetime import datetime
 import time
 
-from electracommons.log_config import PrefectLogger
+from consulterscommons.log_tools import PrefectLogger
 
 logger_prefect = PrefectLogger(__file__)
 
