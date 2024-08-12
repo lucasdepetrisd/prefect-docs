@@ -4,7 +4,7 @@ from prefect import flow, task
 
 # print("PYTHONPATH:" + os.getenv("PYTHONPATH"))
 
-from electracommons.log_config import PrefectLogger
+from consulterscommons.log_tools import PrefectLogger
 
 # os.environ["PREFECT_LOGGING_EXTRA_LOGGERS"] = FILE_NAME
 

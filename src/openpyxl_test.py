@@ -1,7 +1,7 @@
 import openpyxl
 from openpyxl.styles import Font, Alignment, numbers, Border, Side
 import os
-from electracommons.log_config import obtener_path_script
+from consulterscommons.log_tools.prefect_log_config import obtener_path_script
 
 # Crear un nuevo libro de trabajo y una hoja de cálculo
 wb = openpyxl.Workbook()
