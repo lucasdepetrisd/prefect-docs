@@ -5,7 +5,8 @@
 
 C:\nssm-2.24\win64\nssm.exe stop prefserver # Detener en caso que este funcionando
 
-C:\nssm-2.24\win64\nssm.exe install prefserver C:\Reportes_Power_BI\Python\virtualenvs\devenv\Scripts\prefect.exe server start --host 127.0.0.2 --port 5000
+C:\nssm-2.24\win64\nssm.exe install prefserver C:\Reportes_Power_BI\Python\virtualenvs\devenv\Scripts\prefect.exe server start --host 192.168.1.13 --port 442
+# C:\nssm-2.24\win64\nssm.exe install prefserver "C:\Users\Lucas\miniconda3\envs\electraenv\Scripts\prefect.exe" server start --host 127.0.0.2 --port 5000
 C:\nssm-2.24\win64\nssm.exe set prefserver DisplayName "Prefect Server"
 # nssm set "Prefect Server" AppDirectory "C:\service\path"
 
@@ -13,20 +14,22 @@ C:\nssm-2.24\win64\nssm.exe set prefserver DisplayName "Prefect Server"
 # Set descripcion
 # --------------------------------------------------------------
 
-C:\nssm-2.24\win64\nssm.exe set prefserver Description "Servidor Prefect ejecutandose en http://127.0.0.2:5000/"
+C:\nssm-2.24\win64\nssm.exe set prefserver Description "Servidor Prefect ejecutandose en http://192.168.1.13:442/"
 
 #* --------------------------------------------------------------
 #* Set usuario tareas
 #* --------------------------------------------------------------
 
-C:\nssm-2.24\win64\nssm.exe set prefserver ObjectName SRVPWBGW\tareas Tar34s23
+# C:\nssm-2.24\win64\nssm.exe set prefserver ObjectName SRVPWBGW\tareas Tar34s23
 
 # --------------------------------------------------------------
 # Set directorios logeo
 # --------------------------------------------------------------
 
 C:\nssm-2.24\win64\nssm.exe set prefserver AppStdout C:\Reportes_Power_BI\Python\logs_services\server\stdout.log
+# C:\nssm-2.24\win64\nssm.exe set prefserver AppStdout "C:\Users\Lucas\Documents\Consulters\Electra\Python\prefect-test\logs_services\server\stdout.log"
 C:\nssm-2.24\win64\nssm.exe set prefserver AppStderr C:\Reportes_Power_BI\Python\logs_services\server\stderr.log
+# C:\nssm-2.24\win64\nssm.exe set prefserver AppStderr "C:\Users\Lucas\Documents\Consulters\Electra\Python\prefect-test\logs_services\server\stderr.log"
 
 # --------------------------------------------------------------
 # Set tipo de creacion de archivos de logeo. 4 = OPEN_ALWAYS. Crear si no se encontro y append al final

@@ -42,7 +42,7 @@ formatters:
 # que contengan ciertos valores de los logs de la terminal
 filters:
     remove_specific_logs:
-        (): electracommons.log_config.RemoveSpecificLogs
+        (): consulterscommons.log_tools.prefect_log_config.RemoveSpecificLogs
 
 handlers:
 
