@@ -5,20 +5,21 @@
 C:\nssm-2.24\win64\nssm.exe stop prefpoolprod # Detener en caso que este funcionando
 
 C:\nssm-2.24\win64\nssm.exe install prefpoolprod C:\Reportes_Power_BI\Python\virtualenvs\devenv\Scripts\prefect.exe worker start --pool pool-prod
+# C:\nssm-2.24\win64\nssm.exe install prefpoolprod "C:\Users\Lucas\miniconda3\envs\electraenv\Scripts\prefect.exe" worker start --pool pool-prod
 C:\nssm-2.24\win64\nssm.exe set prefpoolprod DisplayName "Prefect Pool - Prod"
-# nssm set "Prefect Pool - prod" AppDirectory "C:\service\path"
+# nssm set "Prefect Pool - Prod" AppDirectory "C:\service\path"
 
 # --------------------------------------------------------------
 # Set descripcion
 # --------------------------------------------------------------
 
-C:\nssm-2.24\win64\nssm.exe set prefpoolprod Description "Pool de ejecuciones en entorno de producción"
+C:\nssm-2.24\win64\nssm.exe set prefpoolprod Description "Pool de ejecuciones en entorno de desarrollo"
 
 #* --------------------------------------------------------------
 #* Set usuario tareas
 #* --------------------------------------------------------------
 
-C:\nssm-2.24\win64\nssm.exe set prefpoolprod ObjectName SRVPWBGW\tareas Tar34s23
+# C:\nssm-2.24\win64\nssm.exe set prefpoolprod ObjectName SRVPWBGW\tareas Tar34s23
 
 # --------------------------------------------------------------
 # Set directorios logeo
@@ -26,6 +27,8 @@ C:\nssm-2.24\win64\nssm.exe set prefpoolprod ObjectName SRVPWBGW\tareas Tar34s23
 
 C:\nssm-2.24\win64\nssm.exe set prefpoolprod AppStdout C:\Reportes_Power_BI\Python\logs_services\pools\pool-prod\stdout.log
 C:\nssm-2.24\win64\nssm.exe set prefpoolprod AppStderr C:\Reportes_Power_BI\Python\logs_services\pools\pool-prod\stderr.log
+# C:\nssm-2.24\win64\nssm.exe set prefpoolprod AppStdout C:\Users\Lucas\Documents\Consulters\Electra\Python\prefect-test\logs_services\pools\pool-prod\stdout.log
+# C:\nssm-2.24\win64\nssm.exe set prefpoolprod AppStderr C:\Users\Lucas\Documents\Consulters\Electra\Python\prefect-test\logs_services\pools\pool-prod\stderr.log
 
 # --------------------------------------------------------------
 # Set tipo de creacion de archivos de logeo. 4 = OPEN_ALWAYS. Crear si no se encontro y append al final
