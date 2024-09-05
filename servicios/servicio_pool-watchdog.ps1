@@ -4,8 +4,8 @@
 
 C:\nssm-2.24\win64\nssm.exe stop prefpoolwd # Detener en caso que este funcionando
 
-# C:\nssm-2.24\win64\nssm.exe install prefpoolwd C:\Reportes_Power_BI\Python\virtualenvs\devenv\Scripts\prefect.exe worker start --pool watchdog-pool
-C:\nssm-2.24\win64\nssm.exe install prefpoolwd "C:\Users\Lucas\miniconda3\envs\electraenv\Scripts\prefect.exe" worker start --pool watchdog-pool
+C:\nssm-2.24\win64\nssm.exe install prefpoolwd C:\Reportes_Power_BI\Python\virtualenvs\devenv\Scripts\prefect.exe worker start --pool watchdog-pool
+# C:\nssm-2.24\win64\nssm.exe install prefpoolwd "C:\Users\Lucas\miniconda3\envs\electraenv\Scripts\prefect.exe" worker start --pool watchdog-pool
 C:\nssm-2.24\win64\nssm.exe set prefpoolwd DisplayName "Prefect Pool - Watchdog"
 # nssm set "Prefect Watchdog Pool" AppDirectory "C:\service\path"
 

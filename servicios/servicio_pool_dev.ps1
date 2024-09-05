@@ -4,8 +4,8 @@
 
 C:\nssm-2.24\win64\nssm.exe stop prefpooldev # Detener en caso que este funcionando
 
-# C:\nssm-2.24\win64\nssm.exe install prefpooldev C:\Reportes_Power_BI\Python\virtualenvs\devenv\Scripts\prefect.exe worker start --pool pool-dev
-C:\nssm-2.24\win64\nssm.exe install prefpooldev "C:\Users\Lucas\miniconda3\envs\electraenv\Scripts\prefect.exe" worker start --pool pool-dev
+C:\nssm-2.24\win64\nssm.exe install prefpooldev C:\Reportes_Power_BI\Python\virtualenvs\devenv\Scripts\prefect.exe worker start --pool pool-dev
+# C:\nssm-2.24\win64\nssm.exe install prefpooldev "C:\Users\Lucas\miniconda3\envs\electraenv\Scripts\prefect.exe" worker start --pool pool-dev
 C:\nssm-2.24\win64\nssm.exe set prefpooldev DisplayName "Prefect Pool - Dev"
 # nssm set "Prefect Pool - Dev" AppDirectory "C:\service\path"
 
@@ -25,8 +25,10 @@ C:\nssm-2.24\win64\nssm.exe set prefpooldev Description "Pool de ejecuciones en 
 # Set directorios logeo
 # --------------------------------------------------------------
 
-C:\nssm-2.24\win64\nssm.exe set prefpooldev AppStdout C:\Users\Lucas\Documents\Consulters\Electra\Python\prefect-test\logs_services\pools\pool-dev\stdout.log
-C:\nssm-2.24\win64\nssm.exe set prefpooldev AppStderr C:\Users\Lucas\Documents\Consulters\Electra\Python\prefect-test\logs_services\pools\pool-dev\stderr.log
+C:\nssm-2.24\win64\nssm.exe set prefpooldev AppStdout C:\Reportes_Power_BI\Python\logs_services\pools\pool-dev\stdout.log
+C:\nssm-2.24\win64\nssm.exe set prefpooldev AppStderr C:\Reportes_Power_BI\Python\logs_services\pools\pool-dev\stderr.log
+# C:\nssm-2.24\win64\nssm.exe set prefpooldev AppStdout C:\Users\Lucas\Documents\Consulters\Electra\Python\prefect-test\logs_services\pools\pool-dev\stdout.log
+# C:\nssm-2.24\win64\nssm.exe set prefpooldev AppStderr C:\Users\Lucas\Documents\Consulters\Electra\Python\prefect-test\logs_services\pools\pool-dev\stderr.log
 
 # --------------------------------------------------------------
 # Set tipo de creacion de archivos de logeo. 4 = OPEN_ALWAYS. Crear si no se encontro y append al final
