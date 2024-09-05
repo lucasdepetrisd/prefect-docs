@@ -20,7 +20,7 @@ from prefect.client.schemas.actions import LogCreate
 from prefect.client.orchestration import PrefectClient
 from prefect.states import Cancelled
 
-from electracommons.log_config import PrefectLogger
+from consulterscommons.log_tools import PrefectLogger
 
 logger_prefect = PrefectLogger(__file__)
 

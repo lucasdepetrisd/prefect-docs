@@ -2,7 +2,7 @@ import asyncio
 from prefect import flow
 # from prefect.concurrency import asyncio
 
-from electracommons.log_config import PrefectLogger
+from consulterscommons.log_tools import PrefectLogger
 
 logger_prefect = PrefectLogger(__file__)
 
