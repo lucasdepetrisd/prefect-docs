@@ -459,11 +459,15 @@ Entre las configuraciones principales de los perfiles se encuentran
 * `PREFECT_API_URL='http://192.168.1.13:442/api'` para indicar que las ejecuciones y *deploys* se dirijan a esa URL.
 * `PREFECT_LOGGING_SETTINGS_PATH='C:\Users\usuario\.prefect\logging_new.yml'` para configurar el logeo con consulterscommons.log_tools
 
+Además se pueden pueden agregar tambien variables para que en el momento de la ejecución Prefect las levante y utilice esos valores de manera global.
+
 Para configurar la carpeta donde se guardará la base de datos de Prefect junto con su configuración se debe setear la variable de entorno `PREFECT_HOME` **a nivel sistema.**
 
 * `$env:PREFECT_HOME = 'C:\Users\usuario\.prefect'`
 
-Se pueden agregar variables para que en el momento de la ejecución Prefect las levante y utilice esos valores de manera global.
+Para evitar advertencias de codificación en Windows al ejecutar flujos se debe setear la variable de entorno `PYTHONUTF8` **a nivel sistema.**
+
+* `$env:PYTHONUTF8 = 1`
 
 # 8. Watchdog
 
