@@ -130,7 +130,7 @@ Resultados:
 > 
 > Las tareas son **unidades atómicas y representan la más mínima expresión de trabajo en una ejecución.**
 > 
-> A partir de `Prefect >= 2.18.x` las tareas pueden ejecutar otras tareas y pero se mantiene la imposibilidad de transicionar de una tarea a un flujo.
+> A partir de `Prefect >= 2.18.x` las tareas pueden ejecutar otras tareas pero se mantiene la imposibilidad de transicionar de una tarea a un flujo.
 >
 > Por lo tanto se pueden realizar las siguientes transiciones:
 > - Flujo -> Flujo
