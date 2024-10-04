@@ -130,7 +130,7 @@ Resultados:
 > 
 > Las tareas son **unidades atómicas y representan la más mínima expresión de trabajo en una ejecución.**
 > 
-> A partir de `Prefect >= 2.18.x` las tareas pueden ejecutar otras tareas y pero se mantiene la imposibilidad de transicionar de una tarea a un flujo.
+> A partir de `Prefect >= 2.18.x` las tareas pueden ejecutar otras tareas pero se mantiene la imposibilidad de transicionar de una tarea a un flujo.
 >
 > Por lo tanto se pueden realizar las siguientes transiciones:
 > - Flujo -> Flujo
@@ -146,7 +146,7 @@ Los *deploys* (despliegues) son conexiones del servidor local de prefect con nue
 Los despliegues son configuraciones que definen cómo y dónde se ejecutan los flujos de trabajo de Prefect. Incluyen detalles como la ubicación del código y los parámetros requeridos. También indican quien ejecutará el flujo (que *work pool*) y el tipo de infraestructura necesaria.
 
 > [!NOTE]
-> Antes de crear un *deploy* es recomendable haber creado previamente una *work pool* que reciba ese *deploy*. Para más información visita la sección [Work Pools](#5.-Work-Pools).
+> Antes de crear un *deploy* es recomendable haber creado previamente una *work pool* que reciba ese *deploy*. Para más información visita la sección [Work Pools](#5-work-pools).
 
 Crear un despliegue es sencillo y se puede hacer de dos maneras: desde la terminal o ejecutando desde Python el flujo con sus detalles de despliegue.
 
