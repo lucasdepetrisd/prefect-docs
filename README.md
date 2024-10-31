@@ -26,7 +26,7 @@
 - [9. Manejo de Credenciales](#9-manejo-de-credenciales)
   - [Variables](#variables)
   - [Secretos](#secretos)
-- [9. Recursos](#9-recursos)
+- [10. Recursos](#10-recursos)
 
 ## 1.2 Esta guía
 Esta guía tiene como objetivo brindar una introducción a Prefect, una plataforma de automatización de flujos de trabajo en Python. Se explicarán los conceptos básicos de Prefect, cómo crear flujos y despliegues de scripts locales o en GitHub, cómo configurar el logeo y cómo utilizar Watchdog y automatizaciones para cancelar ejecuciones atascadas. También se explicará cómo configurar perfiles en Prefect para manejar diferentes configuraciones de la plataforma.
@@ -133,7 +133,7 @@ Resultados:
 > 
 > Las tareas son **unidades atómicas y representan la más mínima expresión de trabajo en una ejecución.**
 > 
-> A partir de `Prefect >= 2.18.x` las tareas pueden ejecutar otras tareas y pero se mantiene la imposibilidad de transicionar de una tarea a un flujo.
+> A partir de `Prefect >= 2.18.x` las tareas pueden ejecutar otras tareas pero se mantiene la imposibilidad de transicionar de una tarea a un flujo.
 >
 > Por lo tanto se pueden realizar las siguientes transiciones:
 > - Flujo -> Flujo
@@ -149,7 +149,7 @@ Los *deploys* (despliegues) son conexiones del servidor local de prefect con nue
 Los despliegues son configuraciones que definen cómo y dónde se ejecutan los flujos de trabajo de Prefect. Incluyen detalles como la ubicación del código y los parámetros requeridos. También indican quien ejecutará el flujo (que *work pool*) y el tipo de infraestructura necesaria.
 
 > [!NOTE]
-> Antes de crear un *deploy* es recomendable haber creado previamente una *work pool* que reciba ese *deploy*. Para más información visita la sección [Work Pools](#5.-Work-Pools).
+> Antes de crear un *deploy* es recomendable haber creado previamente una *work pool* que reciba ese *deploy*. Para más información visita la sección [Work Pools](#5-work-pools).
 
 Crear un despliegue es sencillo y se puede hacer de dos maneras: desde la terminal o ejecutando desde Python el flujo con sus detalles de despliegue.
 
@@ -540,8 +540,7 @@ if __name__ == "__main__":
     mi_flujo()
 ```
 
-
-# 9. Recursos
+# 10. Recursos
 
 - [Documentación oficial de Prefect 3.x](https://docs.prefect.io/)
 - [Documentación oficial de Prefect 2.x](https://docs-2.prefect.io/)
