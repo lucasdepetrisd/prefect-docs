@@ -23,6 +23,9 @@
   - [6.3. Logger Personalizado](#63-logger-personalizado)
 - [7. Perfiles](#7-perfiles)
 - [8. Watchdog](#8-watchdog)
+- [9. Manejo de Credenciales](#9-manejo-de-credenciales)
+  - [Variables](#variables)
+  - [Secretos](#secretos)
 - [9. Recursos](#9-recursos)
 
 ## 1.2 Esta guía
@@ -479,6 +482,64 @@ Las ejecuciones a veces pueden quedar atascadas, la conexión se puede caer y la
 Watchdog revisa ejecuciones en estado `Late` en las que la hora actual difiere de la hora de ejecución programada en por ejemplo 4 horas. O también ejecuciones en estado `Running` que estuvieron durante más de 2 horas corriendo. Este script se encarga de cambiar su estado a `Cancelled` para así no tener en el registro ejecuciones tardías o congeladas.
 
 Para más info visitar el script [Watchdog](src/watchdog/watchdog.py).
+
+# 9. Manejo de Credenciales
+
+Prefect permite la gestión de variables y secretos de manera segura a través de su interfaz y API. Esto es útil para almacenar credenciales, tokens de API, y otras configuraciones sensibles.
+
+## Variables
+
+Las variables en Prefect se pueden utilizar para almacenar configuraciones que pueden cambiar entre diferentes entornos o ejecuciones. Para crear una variable:
+
+1. Ve a la interfaz de Prefect.
+2. Navega a la sección de Variables.
+3. Crea una nueva variable con el nombre y valor deseado.
+
+Para acceder a una variable en tu código Prefect:
+
+```python
+from prefect import task, flow
+from prefect.variables import Variable
+
+CREDENCIAL_STR: str = Variable.get('sql_server_softland')
+
+@task
+def mi_tarea():
+    print(f"El valor de CREDENCIAL_STR es: {CREDENCIAL_STR}")
+
+@flow
+def mi_flujo():
+    mi_tarea()
+
+if __name__ == "__main__":
+    mi_flujo()
+```
+
+## Secretos
+Los bloques secretos son utilizados para almacenar información sensible como credenciales y tokens. Para crear un bloque secreto:
+
+Ve a la interfaz de Prefect.
+Navega a la sección de Bloques.
+Crea un nuevo bloque secreto con el nombre y valor deseado.
+Para acceder a un bloque secreto en tu código Prefect:
+
+```python
+from prefect import task, flow
+from prefect.blocks.system import Secret
+
+@task
+def mi_tarea():
+    mi_secreto = Secret.load("mi_secreto")
+    print(f"El valor de mi_secreto es: {mi_secreto.get()}")
+
+@flow
+def mi_flujo():
+    mi_tarea()
+
+if __name__ == "__main__":
+    mi_flujo()
+```
+
 
 # 9. Recursos
 
