@@ -26,7 +26,7 @@
 - [9. Manejo de Credenciales](#9-manejo-de-credenciales)
   - [Variables](#variables)
   - [Secretos](#secretos)
-- [9. Recursos](#9-recursos)
+- [10. Recursos](#10-recursos)
 
 ## 1.2 Esta guía
 Esta guía tiene como objetivo brindar una introducción a Prefect, una plataforma de automatización de flujos de trabajo en Python. Se explicarán los conceptos básicos de Prefect, cómo crear flujos y despliegues de scripts locales o en GitHub, cómo configurar el logeo y cómo utilizar Watchdog y automatizaciones para cancelar ejecuciones atascadas. También se explicará cómo configurar perfiles en Prefect para manejar diferentes configuraciones de la plataforma.
@@ -540,8 +540,7 @@ if __name__ == "__main__":
     mi_flujo()
 ```
 
-
-# 9. Recursos
+# 10. Recursos
 
 - [Documentación oficial de Prefect 3.x](https://docs.prefect.io/)
 - [Documentación oficial de Prefect 2.x](https://docs-2.prefect.io/)
