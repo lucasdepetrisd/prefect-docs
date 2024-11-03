@@ -1,5 +1,5 @@
 > [!IMPORTANT]
-> Actualizado a `Prefect >= 3.0.0`
+> Actualizado a `Prefect 3.x`
 
 > [!IMPORTANT]
 > **Este documento es una guía de referencia rápida para el uso de Prefect de manera local. Para una guía más detallada y completa se recomienda visitar la [documentación oficial de Prefect](https://docs.prefect.io/).**
@@ -266,7 +266,34 @@ En este caso se está creando un despliegue de un script que se encuentra en el 
 
 Una vez creado el despliegue de esta manera, al momento de ejecutar el script Prefect descargará el código del repositorio de git desde la rama especificada (en este caso `main`) y lo ejecutará.
 
-Esto supone que se tiene un token de acceso a git almacenado en Prefect como una variable secreta. Para más información sobre cómo almacenar secretos en Prefect visita [Blocks - Prefect Docs 2.x](https://docs-2.prefect.io/latest/concepts/blocks/?h=block#use-existing-block-types).
+Este script supone que se tiene un token de acceso a git almacenado en Prefect como una variable secreta y de nombre `desarrollos-electra-access-token`. Para obtener este PAT (Personal Access Token) en GitHub y configurarlo en Prefect se deben seguir los siguientes pasos:
+
+<details>
+<summary>Configurar el PAT en GitHub y Prefect</summary>
+
+1. Si el repositorio que se quiere utilizar esta en una organización primero se debe permitir el uso de tokens para los repositorios de la misma. Esto se encuentra en Organization > Settings > Personal Access Token o en el link: https://github.com/organizations/DesarrollosElectra/settings/personal-access-tokens
+
+    ![Configuración de PAT para la organización](img/github_pat_org.png)
+
+2. Desde una cuenta perteneciente a la organización o que tenga acceso al repositorio ingresar a Profile > Settings > Developer Settings > Personal Access Token > Fine-grained Tokens
+3. Crear un token de acceso. Seleccionar al dueño de recursos como la organización. Luego seleccionar solo el repositorio al que se le desea proveer acceso.
+    ![Configuración de PAT en el usuario](img/github_pat_user.png)
+4. En Repository Permissions para el permiso Contents seleccionar Read-only.
+5. Confirmar creación del token y copiarlo ya que no se podrá verlo nuevamente.
+6. Ingresar a la IU de Prefect a la sección Blocks y crear o actualizar un bloque de tipo Secreto que tenga de nombre el deseado, por ejemplo `desarrollos-electra-access-token`. Luego pegar la clave generada en el campo Value como tipo password o string.
+
+</details>
+
+Una vez configurado para desplegar desde GitHub se deben seguir los siguientes tres pasos:
+
+1. **¡Importante!** Subir el script a desplegar a GitHub.
+2. Ejecutar el despliegue como en el script de arriba utilizando el nombre del bloque y ejecutarlo para que se cree el despliegue. **Tener en cuenta que si el script que se quiere desplegar no está todavia en el repositorio de GitHub entonces este despliegue fallará ya que no lo encontrará.**
+3.  Una vez desplegado y en la terminal se muestre un mensaje de despliegue correcto ingresar a la página del despliegue y revisar su configuración. Si aparece algo como en la imagen entonces el despliegue se realizó correctamente y se puede ejecutar para probar.
+    ![Despliegue desde GitHub correcto](img/despliegue_correcto.png)
+
+Para más información sobre el despliegue desde GitHub visitar [Retrieve code from storage - Prefect Docs 3.x](https://docs.prefect.io/3.0/deploy/infrastructure-concepts/store-flow-code#git-based-storage)
+
+Para más información sobre cómo almacenar secretos en Prefect visita la sección de este documento sobre el manejo de credenciales o la documentación oficial de Prefect: [Blocks - Prefect Docs 2.x](https://docs-2.prefect.io/latest/concepts/blocks/?h=block#use-existing-block-types).
 
 > [!NOTE]
 > Tener en cuenta que al ejecutar el script descargado de GitHub se ejecutará en un directorio interno de Prefect y no en el directorio de trabajo del usuario y tendría los siguientes efectos:
@@ -274,10 +301,7 @@ Esto supone que se tiene un token de acceso a git almacenado en Prefect como una
 > - **Si el script logeara a un archivo de log, este se guardará en el directorio interno de Prefect y no en el directorio del usuario.** Para monitorear los logs entonces se deberá acceder a la IU de Prefect.
 > - En caso de que el script descargado necesite de otros archivos o módulos, estos deberán estar en el repositorio de git.
 
-<!-- ```shell
-? Deployment name (default): printear-mensaje # Ingreso un nombre para el deploy.
-? Would you like to configure a schedule for this deployment? [y/n] (y): n # No configuro la ejecución automática
-``` -->
+
 # 5. Work Pools
 
 En Prefect, las *Work Pools* (grupos de trabajo) son conjuntos de *workers* o trabajadores que se pueden configurar para ejecutar flujos de trabajo específicos. Permiten la gestión de recursos del sistema y la ejecución de los flujos.
@@ -474,8 +498,8 @@ Para evitar advertencias de codificación en Windows al ejecutar flujos se debe 
 
 # 8. Watchdog
 
-> [!NOTE]
-> A partir de Prefect 3.0.0 se pueden utilizar las Automatizaciones para una mayor flexibilidad y control sobre las ejecuciones. Estas incluyen la capacidad de definir reglas personalizadas para la cancelación de flujos y de esta manera reemplazan al Watchdog. Lo siguiente se sugiere solo si se utiliza `prefect < 3.0`. Para más información visita [Automations - Prefect Docs](https://docs.prefect.io/3.0/automate/index)
+> [!IMPORTANT]
+> A partir de Prefect 3.0.0 se pueden utilizar las Automatizaciones para una mayor flexibilidad y control sobre las ejecuciones. Estas incluyen la capacidad de definir reglas personalizadas para la cancelación de flujos y de esta manera reemplazan al Watchdog. Esta sección se sugiere solo si se utiliza `prefect < 3.x`. Para más información visita [Automations - Prefect Docs](https://docs.prefect.io/3.0/automate/index)
 
 Las ejecuciones a veces pueden quedar atascadas, la conexión se puede caer y la computadora se puede apagar, imprevistos siempre pueden surgir y para manejarlos en Prefect tenemos el Watchdog. Watchdog es un script común que se ejecuta cada 30 minutos y que se encarga de cancelar esas ejecuciones atrasadas o congeladas.
 
