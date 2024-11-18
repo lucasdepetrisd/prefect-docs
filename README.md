@@ -1,5 +1,5 @@
 > [!IMPORTANT]
-> Actualizado a `Prefect 3.x`
+> Documentación para `prefect >= 3.x`
 
 > [!IMPORTANT]
 > **Este documento es una guía de referencia rápida para el uso de Prefect de manera local. Para una guía más detallada y completa se recomienda visitar la [documentación oficial de Prefect](https://docs.prefect.io/).**
@@ -10,11 +10,12 @@
   - [1.1 Tabla de contenidos](#11-tabla-de-contenidos)
   - [1.2 Esta guía](#12-esta-guía)
 - [2. Sobre Prefect](#2-sobre-prefect)
+  - [2.1 Instalar Prefect](#21-instalar-prefect)
 - [3. Flujos y Tareas](#3-flujos-y-tareas)
   - [3.1. Subflujos](#31-subflujos)
 - [4. Deploys](#4-deploys)
   - [4.1 Crear un despliegue desde la terminal](#41-crear-un-despliegue-desde-la-terminal)
-  - [4.2 Crear un despliegue de un script local desde Python](#42-crear-un-despliegue-de-un-script-local-desde-python)
+  - [4.2 Crear un despliegue de un script local desde Python (Recomedado)](#42-crear-un-despliegue-de-un-script-local-desde-python-recomedado)
   - [4.3 Crear un despliegue de un script en GitHub desde Python](#43-crear-un-despliegue-de-un-script-en-github-desde-python)
 - [5. Work Pools](#5-work-pools)
 - [6. Logeo](#6-logeo)
@@ -22,11 +23,16 @@
   - [6.2. Logger de Python](#62-logger-de-python)
   - [6.3. Logger Personalizado](#63-logger-personalizado)
 - [7. Perfiles](#7-perfiles)
-- [8. Watchdog](#8-watchdog)
-- [9. Manejo de Credenciales](#9-manejo-de-credenciales)
+- [8. Manejo de Credenciales](#8-manejo-de-credenciales)
   - [Variables](#variables)
-  - [Secretos](#secretos)
-- [10. Recursos](#10-recursos)
+  - [Secrets](#secrets)
+- [10. SDK de Prefect](#10-sdk-de-prefect)
+  - [10.1 Scripts desarrollados con el SDK de Prefect](#101-scripts-desarrollados-con-el-sdk-de-prefect)
+    - [10.1.1 Información de Ejecuciones y Despliegues](#1011-información-de-ejecuciones-y-despliegues)
+    - [10.1.2 Monitoreo Periódico](#1012-monitoreo-periódico)
+    - [10.1.3 Metadatos](#1013-metadatos)
+    - [10.1.4 Watchdog](#1014-watchdog)
+- [11. Recursos](#11-recursos)
 
 ## 1.2 Esta guía
 Esta guía tiene como objetivo brindar una introducción a Prefect, una plataforma de automatización de flujos de trabajo en Python. Se explicarán los conceptos básicos de Prefect, cómo crear flujos y despliegues de scripts locales o en GitHub, cómo configurar el logeo y cómo utilizar Watchdog y automatizaciones para cancelar ejecuciones atascadas. También se explicará cómo configurar perfiles en Prefect para manejar diferentes configuraciones de la plataforma.
@@ -43,6 +49,20 @@ Esta plataforma sigue la idea de *"[code as workflows](https://www.prefect.io/bl
 
 ![Funcionamiento de Prefect](img/funcionamiento_prefect.png)
 *Funcionamiento de Prefect: Este diagrama muestra el flujo de trabajo en Prefect, la definición del código, el despliegue y la ejecución en el servidor.*
+
+## 2.1 Instalar Prefect
+Para instalar prefect se sugiere leer la documentación oficial con las instrucciones. Se sugiere para evitar problemas a futuro instalarlo desde el principio en un entorno virtual y evitar de todas formas que este instalado de manera global. Esto puede llevar a problemas en un futuro ya que se crearán dos instalaciones distintas de prefect. Aquí se describen los pasos para configurarlo de manera local utilizando Windows.
+
+1. Crear un entorno virtual.
+2. Instalar prefect utilizando `pip install prefect`.
+3. Chequear que se instalo correctamente con `prefect version`.
+3. Configurar prefect. Para esto ejecutar `prefect config view` para ver como esta configurado.
+   1. Primero deberemos indicarle a prefect donde debera almacenar la configuración, su base de datos y demás información del servidor.
+      1. Para esto se debe crear una variable de entorno del sistema ingresando al editor de variables de entorno de Windows.
+      2. Luego crear una variable del sistema con nombre `PREFECT_HOME` y valor `C:\Users\usuario\.prefect`. Esto permitirá que la configuración la almacene el usuario de servicio `usuario`.
+      3. Reiniciar la terminal y ejecutar nuevamente `prefect config view` para chequear que se haya guardado y detectado correctamente.
+   2. Luego debemos configurar el logging. Para esto chequear la sección [6.3. Logger Personalizado](#63-logger-personalizado).
+   3. Finalmente debemos asignar la URL de Prefect para que maquinas remotas (PCs de desarrolladores) se puedan conectar y abrir la interfaz. Aquí ejecutar `prefect config set PREFECT_API_URL='http://<IP LOCAL>:<PUERTO>/api'`.
 
 # 3. Flujos y Tareas
 
@@ -144,9 +164,11 @@ Resultados:
 > - Tarea -> Flujo
 
 # 4. Deploys
-Los *deploys* (despliegues) son conexiones del servidor local de prefect con nuestro código. Los *deploys* nos permiten establecer la ubicación del script (ya sea local o en git) y configurar como se ejecutará (de manera manual, programada, por intervalos, etc). Son el paralelo a las tareas que utilizábamos en el Programador de Tareas de Windows.
-
-Los despliegues son configuraciones que definen cómo y dónde se ejecutan los flujos de trabajo de Prefect. Incluyen detalles como la ubicación del código y los parámetros requeridos. También indican quien ejecutará el flujo (que *work pool*) y el tipo de infraestructura necesaria.
+**Los *deploys* o despliegues son configuraciones que definen cómo y dónde se ejecutan los flujos de Prefect.** Son el paralelo a las tareas que utilizábamos en el Programador de Tareas de Windows. Incluyen detalles de la ejecución como:
+- **De donde se obtendrá el código:** local o un repositorio de GitHub
+- **Que paramétros se utilizarán**
+- **Cuando se ejecutará:** en un intervalo o una programación de Cron
+- **Donde y quien lo ejecutará:** en la maquina con una *work pool* local o de manera remota como AWS o Azure.
 
 > [!NOTE]
 > Antes de crear un *deploy* es recomendable haber creado previamente una *work pool* que reciba ese *deploy*. Para más información visita la sección [Work Pools](#5-work-pools).
@@ -201,7 +223,7 @@ Luego se nos solicitarán diferentes configuraciones para el *deploy*:
 > [!TIP]
 > Para cada *deploy* utilizar una pool coherente. Por ejemplo para un *deploy* de tipo **productivo** utilizá la pool ```pool-prod```. Esto se debe a que las pools pueden tener configuraciones de entorno y recursos diferentes.
 
-## 4.2 Crear un despliegue de un script local desde Python
+## 4.2 Crear un despliegue de un script local desde Python (Recomedado)
 
 Para crear un *deploy* desde Python se debe ejecutar el flujo con la función ```flow_name.from_source().deploy()``` pasando los parámetros necesarios.
 
@@ -495,18 +517,7 @@ Para evitar advertencias de codificación en Windows al ejecutar flujos se debe 
 
 * `$env:PYTHONUTF8 = 1`
 
-# 8. Watchdog
-
-> [!IMPORTANT]
-> A partir de Prefect 3.0.0 se pueden utilizar las Automatizaciones para una mayor flexibilidad y control sobre las ejecuciones. Estas incluyen la capacidad de definir reglas personalizadas para la cancelación de flujos y de esta manera reemplazan al Watchdog. Esta sección se sugiere solo si se utiliza `prefect < 3.x`. Para más información visita [Automations - Prefect Docs](https://docs.prefect.io/3.0/automate/index)
-
-Las ejecuciones a veces pueden quedar atascadas, la conexión se puede caer y la computadora se puede apagar, imprevistos siempre pueden surgir y para manejarlos en Prefect tenemos el Watchdog. Watchdog es un script común que se ejecuta cada 30 minutos y que se encarga de cancelar esas ejecuciones atrasadas o congeladas.
-
-Watchdog revisa ejecuciones en estado `Late` en las que la hora actual difiere de la hora de ejecución programada en por ejemplo 4 horas. O también ejecuciones en estado `Running` que estuvieron durante más de 2 horas corriendo. Este script se encarga de cambiar su estado a `Cancelled` para así no tener en el registro ejecuciones tardías o congeladas.
-
-Para más info visitar el script [Watchdog](src/watchdog/watchdog.py).
-
-# 9. Manejo de Credenciales
+# 8. Manejo de Credenciales
 
 Prefect permite la gestión de variables y secretos de manera segura a través de su interfaz y API. Esto es útil para almacenar credenciales, tokens de API, y otras configuraciones sensibles.
 
@@ -538,12 +549,13 @@ if __name__ == "__main__":
     mi_flujo()
 ```
 
-## Secretos
+## Secrets
 Los bloques secretos son utilizados para almacenar información sensible como credenciales y tokens. Para crear un bloque secreto:
 
-Ve a la interfaz de Prefect.
-Navega a la sección de Bloques.
-Crea un nuevo bloque secreto con el nombre y valor deseado.
+1. Ve a la interfaz de Prefect.
+2. Navega a la sección de Bloques.
+3. Crea un nuevo bloque de tipo `Secret` con el nombre y valor deseado.
+
 Para acceder a un bloque secreto en tu código Prefect:
 
 ```python
@@ -563,7 +575,222 @@ if __name__ == "__main__":
     mi_flujo()
 ```
 
-# 10. Recursos
+# 10. SDK de Prefect
+Cuando interactuamos desde la IU de Prefect como cuando ejecutamos un despliegue, visualizamos las últimas ejecuciones, creamos una variable, etc, lo que estamos haciendo es enviar peticiones a la API del servidor de Prefect que esta corriendo por detrás y luego este servidor se encarga de realizar las operaciones necesarias para cumplir con la petición. Así como lo hacemos desde la interfaz de usuario tambien podemos realizar peticiones a la API directamente desde scripts. Pero si se lo realiza desde Python hay una opción mucho mejor que es el SDK (Software Development Kit) de Prefect.
+
+Un **SDK (Software Development Kit)** es un conjunto de herramientas, bibliotecas y recursos proporcionados por una aplicación o plataforma para permitir la interacción programática con ella. Su objetivo es facilitar el desarrollo de nuevas aplicaciones que puedan integrarse y comunicarse de manera eficiente con la aplicación o plataforma original. 
+
+En este contexto, **Prefect** provee su SDK al instalarlo, como se explicó en la sección [2.1 Instalar Prefect](#21-instalar-prefect). Para más detalles sobre el SDK de Prefect, visitar su documentación [Prefect Client SDK](https://docs.prefect.io/latest/guides/using-the-client/).
+
+El SDK de Prefect permite acceder a información del servidor y sus objetos, además de facilitar la creación y modificación de objetos. Todas las acciones disponibles en la interfaz de usuario, y por lo tanto en su API, pueden ser replicadas mediante este SDK. 
+
+Por ejemplo, si quisieramos chequear que el servidor de Prefect está funcionando correctamente podríamos utilizar el SDK de la siguiente manera:
+
+```python
+
+from prefect import get_client
+
+async def check_prefect():
+    async with get_client() as client:
+        try:
+            await client.api_healthcheck() # Retorna None si se conecto correctamente. Una excepción si fallo al conectar.
+        except Exception as e:
+            print("Fallo al conectar con la siguiente excepción:" + e)
+```
+
+El SDK de Prefect no solo nos permite verificar el estado del servidor, sino también acceder a información detallada sobre ejecuciones, despliegues, flujos, tareas y otros objetos de Prefect. Para realizar algunas operaciones específicas, como filtrar ejecuciones de flujos fallidas, es necesario importar clases adicionales, como `FlowRunFilter`.
+
+Por ejemplo, para obtener información de ejecuciones de flujo dentro de un rango de fechas y filtrar por estado, se podría usar el siguiente código:
+
+```python
+from prefect.server.schemas.filters import FlowRunFilter
+
+async def get_flow_runs_info(
+        start_date: datetime,
+        end_date: datetime,
+        states: Union[Sequence[str], Sequence[StateType], None] = None
+    ) -> list[dict]:
+    """
+    Obtiene información de ejecuciones de flujo dentro de un rango de fechas y estados específicos.
+    La zona horaria corresponde a UTC.
+
+    Parámetros:
+    - start_date (datetime): Fecha de inicio del rango de fechas.
+    - end_date (datetime): Fecha de fin del rango de fechas.
+    - states (Sequence[str], Sequence[StateType], None): Lista de estados de ejecución a filtrar. Por defecto es None.
+    Retorna:
+    - list[dict]: Lista de diccionarios con información de las ejecuciones de flujo.
+    """
+
+    # Filter for flows that have a start_time
+    flow_run_filter = FlowRunFilter(
+        state={
+            'type': {'any_': states} if states else None,
+        },
+        start_time={
+            'after_': start_date,
+            'before_': end_date
+        }
+    )
+
+    async with get_client() as client:
+        flow_runs = await client.read_flow_runs(
+            flow_run_filter=flow_run_filter,
+            sort="START_TIME_DESC"
+        )
+
+    flow_runs_info = []
+    for flow_run in flow_runs:
+        flow_run_dict = {
+            "id": flow_run.id,
+            "flow_run_name": flow_run.name,
+            "state": {
+                "message": flow_run.state.message,
+                "type": flow_run.state.type
+            },
+            "start_time": flow_run.start_time if flow_run.start_time else flow_run.expected_start_time,
+            "end_time": flow_run.end_time,
+            "total_duration": flow_run.total_run_time,
+            "parameters": flow_run.parameters,
+            "flow_id": flow_run.flow_id,
+            "deployment_id": flow_run.deployment_id
+        }
+        flow_runs_info.append(flow_run_dict)
+
+    return flow_runs_info
+```
+
+> [!TIP] 
+> **¿Cómo identificar que necesitamos `FlowRunFilter` y qué clases importar?**
+> 
+> Al escribir `client.` en VS Code o en otro IDE, aparecerán sugerencias con los métodos disponibles para la clase `client`. Estas sugerencias facilitan descubrir las funciones y características disponibles. Por ejemplo:
+> 
+> ![Sugerencias de Métodos](img/metodos_client.png)
+> 
+> Al seleccionar un método y pasar el cursor sobre él, el IDE mostrará información detallada sobre los parámetros requeridos:
+> 
+> ![Sugerencias de Parámetros](img/parametros_client.png)
+> 
+> Si ves que un parámetro requiere un objeto como `flow_run_filter`, esto indica que necesitas utilizar una clase específica, como `FlowRunFilter`. 
+> 
+> Para identificar de dónde proviene y cómo importar esta clase, puedes:
+> - Ver la definición del método directamente en el IDE (clic derecho sobre el método y seleccionar *Ir a la definición*).
+> - Consultar la documentación oficial del SDK de Prefect para entender su uso y ejemplos prácticos.
+
+Si ya tenemos un despliegue configurado y queremos programar ejecuciones basadas en una lista de fechas y horas (`datetime`), podemos usar una función como la siguiente:
+
+```python
+from prefect.client.schemas.objects import StateType, StateDetails
+from prefect.states import State
+
+async def schedule_executions_for_deploy(deploy_id: UUID, list_executions: list[datetime]) -> dict:
+    """
+    Programa ejecuciones para un despliegue específico en base a una lista de fechas.
+
+    Parámetros:
+    - deploy_id (UUID): ID del despliegue.
+    - list_executions (list[datetime]): Lista de fechas en las que se programarán las ejecuciones.
+
+    Retorna:
+    - dict: Información del último flujo programado.
+    """
+    async with get_client() as client:
+        for dt in list_executions:
+            flow_run_info = await client.create_flow_run_from_deployment(
+                deployment_id=deploy_id,
+                state=State(
+                    type=StateType.SCHEDULED,
+                    state_details=StateDetails(
+                        scheduled_time=dt
+                    )
+                ),
+                tags=["Programado por script"]
+            )
+    return flow_run_info
+```
+
+Puedes encontrar esta y otras funciones más detalladas en la sección [10.1.2 Información de Ejecuciones y Despliegues](#1012-información-de-ejecuciones-y-despliegues).
+
+## 10.1 Scripts desarrollados con el SDK de Prefect
+
+Utilizar el SDK de Prefect nos permitió desarrollar los siguientes scripts:
+
+### 10.1.1 Información de Ejecuciones y Despliegues
+El script `get_prefect_info.py` permite obtener información detallada sobre ejecuciones de flujos, despliegues y otros objetos de Prefect. Utiliza el SDK de Prefect para interactuar con su API y obtener el estado de los flujos.
+
+Este script está disponible en:  
+[src/monitoreo/get_prefect_info.py](https://github.com/lucasdepetrisd/prefect-test/blob/main/src/monitoreo/get_prefect_info.py)
+
+**Funciones principales**:
+
+- **get_flow_runs_info**: Obtiene información de ejecuciones de flujo en un rango de fechas y estados específicos.
+- **get_flow_run_info**: Recupera detalles de una ejecución específica de flujo.
+- **get_flow_info**: Obtiene información de un flujo en particular.
+- **get_deployment_info**: Proporciona detalles sobre un despliegue.
+- **get_subflow_runs_info**: Obtiene información sobre ejecuciones de subflujos.
+- **schedule_executions_for_deploy**: Programa ejecuciones para un despliegue en fechas específicas.
+
+**Uso**:  
+El script permite consultar flujos, ejecuciones y despliegues de Prefect, proporcionando detalles como el estado, duración y parámetros de ejecución. Las consultas pueden filtrarse por fechas, estados y otros criterios.
+
+### 10.1.2 Monitoreo Periódico
+Se desarrolló un script para realizar monitoreo de Prefect. Esto permite enviar emails con información sobre errores detectados en un período específico. Este script, junto a su módulo de formateo y envio de emails, están disponibles en: [src/monitoreo/periodic_report](https://github.com/lucasdepetrisd/prefect-test/ProyectosPython/blob/main/dev/MONITOREO_PREFECT/periodic_report).
+
+Está desplegado en Prefect y programado para ejecutarse automáticamente:
+
+- **Diariamente:** a las 23:55.  
+- **Semanalmente:** los domingos a las 23:55.
+
+El script además utiliza el desarrollo de la siguiente sección [10.1.3 Metadatos](#1013-metadatos) para extraer información adicional de los despliegues.
+
+### 10.1.3 Metadatos
+Al desplegar un flujo que posee en su definición un docstring, Prefect guarda este docstring como la descripción del despliegue. Esto nos permite embeber información adicional que luego puede ser parseada y utilizada para otros fines.
+
+Este desarrollo toma la descripción del despliegue, que incluye metadatos escritos en formato YAML, y los extrae automáticamente para su uso en otros procesos. Los metadatos deben comenzar con tres guiones (`---`) para indicar el inicio del bloque YAML. Los ítems más relevantes de los metadatos son el responsable y el área, ya que nos permiten identificar rápidamente quién es el referente técnico de un desarrollo cuando se produce una falla.
+
+Un ejemplo de cómo se vería este bloque de metadatos en la definición de un flujo sería:
+
+```python
+
+def mi_flujo():
+    """
+    Este flujo realiza una tarea específica.
+
+    ---
+    metadatos:
+        responsable: Juan Pérez
+        area: Compras
+        otros_detalles_lista:
+            - Esta es una lista de ejemplos
+            - De otros detalles que pueden ser agregados
+        mas_detalles_dict:
+            solicito: Fer
+            fecha: 2024-10-10
+            ejecucion: diariamente
+    """
+```
+*Los datos pueden ponerse como lista o como diccionario con una clave y valor. Recordar revisar el indentado correcto de los metadatos.*
+
+Si el despliegue ya existe, bastará con agregar los metadatos y luego redesplegarlo para que Prefect actualice la descripción con la nueva información. Así, el script de monitoreo periódico extraerá estos metadatos y los utilizará para enviar reportes de fallas.
+
+Esta automatización garantiza que la información clave esté siempre accesible en los reportes de fallas, facilitando la gestión y resolución de problemas.
+
+Más detalles de la implementación del script que extrae los metadatos desde la descripción del despliegue y los procesa para su uso se puede encontrar en [src/monitoreo/periodic_report/extract_metadata.py](https://github.com/lucasdepetrisd/prefect-test/blob/main/dev/MONITOREO_PREFECT/periodic_report/extract_metadata.py).
+
+### 10.1.4 Watchdog
+
+> [!WARNING] 
+> **Watchdog deprecado**
+> 
+> A partir de Prefect 3.0 se pueden utilizar las Automatizaciones para una mayor flexibilidad y control sobre las ejecuciones. Estas incluyen la capacidad de definir reglas personalizadas para la cancelación de flujos y de esta manera **reemplazan al Watchdog por lo que fue eliminado de los despliegues**. Esta sección se sugiere solo si se utiliza `prefect < 3.0`. Para más información visita [Automations - Prefect Docs](https://docs.prefect.io/3.0/automate/index).
+
+Las ejecuciones a veces pueden quedar atascadas, la conexión se puede caer y la computadora se puede apagar, imprevistos siempre pueden surgir y para manejarlos en Prefect tenemos el Watchdog. Watchdog es un script común que se ejecuta cada 30 minutos y que se encarga de cancelar esas ejecuciones atrasadas o congeladas.
+
+Watchdog revisa ejecuciones en estado `Late` en las que la hora actual difiere de la hora de ejecución programada en por ejemplo 4 horas. O también ejecuciones en estado `Running` que estuvieron durante más de 2 horas corriendo. Este script se encarga de cambiar su estado a `Cancelled` para así no tener en el registro ejecuciones tardías o congeladas.
+
+Para más info visitar el script [Watchdog](src/watchdog/watchdog.py).
+
+# 11. Recursos
 
 - [Documentación oficial de Prefect 3.x](https://docs.prefect.io/)
 - [Documentación oficial de Prefect 2.x](https://docs-2.prefect.io/)
