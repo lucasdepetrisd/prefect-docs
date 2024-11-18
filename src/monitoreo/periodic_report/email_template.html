@@ -1,0 +1,99 @@
+<html>
+<head>
+    {{ style_str|safe }}
+</head>
+<body>
+    <h2>{{ header_message }}</h2>
+    <h3>Resumen de fallas por flujo:</h3>
+    {{ table_str|safe }}
+    Para más detalles de este período de tiempo dirigirse al siguiente <a href="{{ flow_runs_ui_url }}">enlace</a>.
+    <h3>Detalles de cada flujo fallido:</h3>
+    <ul>
+        {% for flow_run in failed_flow_runs.itertuples() %}
+        <li>
+            <h3>Flujo</h3>
+            <strong>ID:</strong> {{ flow_run.flow_id }}<br>
+            <strong>Nombre:</strong> {{ flow_run.flow_name }}<br>
+
+            {% if flow_run.deployment_id %}
+                <h3>Despliegue</h3>
+                <strong>ID:</strong> {{ flow_run.deployment_id }}<br>
+                <strong>Nombre:</strong> {{ flow_run.deployment_name }}<br>
+                {% flow_run.deployment_entrypoint %}
+                    <strong>Entrypoint:</strong> {{ flow_run.deployment_entrypoint }}<br>
+                {% else %}
+                    <strong>Entrypoint:</strong> No disponible<br>
+                {% endif %}
+                {% if flow_run.deployment_metadata %}
+                    <strong>Metadatos:</strong><br>
+                    <ul>
+                        {% for key, value in flow_run.deployment_metadata.items() %}
+                            {% if key == "responsable" and value %}
+                                <li><strong>Responsable:</strong></li>
+                                <ul>
+                                    <li><strong>Código:</strong> {{ value.id }}</li>
+                                    <li><strong>Nombre:</strong> {{ value.name }}</li>
+                                    <li><strong>Correo:</strong> {{ value.email }}</li>
+                                </ul>
+                            {% elif key == "nombre" and value %}
+                                <li><strong>Nombre del Desarrollo:</strong> {{ value }}</li>
+                            {% elif key == "area" and value %}
+                                <li><strong>Área:</strong> {{ value }}</li>
+                            {% elif value is mapping %}
+                                <li><strong>{{ key|title|replace("_", " ") }}:</strong></li>
+                                <ul>
+                                    {% for sub_key, sub_value in value.items() %}
+                                        <li><strong>{{ sub_key|title|replace("_", " ") }}:</strong> {{ sub_value }}</li>
+                                    {% endfor %}
+                                </ul>
+                            {% elif value is iterable and value is not string %}
+                                <li><strong>{{ key|title|replace("_", " ") }}:</strong></li>
+                                <ul>
+                                    {% for item in value %}
+                                        <li>{{ item }}</li>
+                                    {% endfor %}
+                                </ul>
+                            {% else %}
+                                <li><strong>{{ key|title|replace("_", " ") }}:</strong> {{ value }}</li>
+                            {% endif %}
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <strong>Metadatos:</strong> No disponibles<br>
+                {% endif %}
+            {% else %}
+                <strong>Despliegue:</strong> No desplegado<br>
+            {% endif %}
+
+            <h3>Ejecución</h3>
+            <strong>ID:</strong> {{ flow_run.id }}<br>
+            <strong>Nombre:</strong> {{ flow_run.flow_run_name }}<br>
+            <strong>Mensaje de Estado:</strong> {{ flow_run.state.message }}<br>
+            <strong>Fecha de Inicio:</strong> {{ flow_run.start_time }}<br>
+            <strong>Fecha de Fin:</strong> {{ flow_run.end_time }}<br>
+            <strong>Detalles:</strong> <a href="{{ flow_run.ui_url }}">Enlace</a><br>
+
+            {% if flow_run.subflow_runs %}
+            <h4>Subflujos:</h4>
+            <ul>
+                {% for subflow_run in flow_run.subflow_runs %}
+                <li>
+                    <h4>Flujo:</h4>
+                    <strong>ID:</strong> {{ subflow_run.flow_id }}<br>
+                    <strong>Nombre:</strong> {{ subflow_run.flow_name }}<br>
+
+                    <h4>Ejecución</h4>
+                    <strong>ID:</strong> {{ subflow_run.id }}<br>
+                    <strong>Mensaje de Estado:</strong> {{ subflow_run.state.message }}<br>
+                    <strong>Fecha de Inicio:</strong> {{ subflow_run.start_time }}<br>
+                    <strong>Fecha de Fin:</strong> {{ subflow_run.end_time }}<br>
+                    <strong>Detalles:</strong> <a href="{{ subflow_run.ui_url }}">Enlace</a><br>
+                </li>
+                {% endfor %}
+            </ul>
+            {% endif %}
+        </li>
+        {% endfor %}
+    </ul>
+</body>
+</html>
