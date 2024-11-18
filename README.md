@@ -709,7 +709,7 @@ async def schedule_executions_for_deploy(deploy_id: UUID, list_executions: list[
     return flow_run_info
 ```
 
-Puedes encontrar esta y otras funciones más detalladas en la sección [10.1.2 Información de Ejecuciones y Despliegues](#1012-información-de-ejecuciones-y-despliegues).
+Puedes encontrar esta y otras funciones más detalladas en el desarrollo de la sección [10.1.1 Información de Ejecuciones y Despliegues](#1011-información-de-ejecuciones-y-despliegues).
 
 ## 10.1 Scripts desarrollados con el SDK de Prefect
 
