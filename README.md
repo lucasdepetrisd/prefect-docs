@@ -734,7 +734,7 @@ Este script está disponible en:
 El script permite consultar flujos, ejecuciones y despliegues de Prefect, proporcionando detalles como el estado, duración y parámetros de ejecución. Las consultas pueden filtrarse por fechas, estados y otros criterios.
 
 ### 10.1.2 Monitoreo Periódico
-Se desarrolló un script para realizar monitoreo de Prefect. Esto permite enviar emails con información sobre errores detectados en un período específico. Este script, junto a su módulo de formateo y envio de emails, están disponibles en: [src/monitoreo/periodic_report](https://github.com/lucasdepetrisd/prefect-test/ProyectosPython/blob/main/dev/MONITOREO_PREFECT/periodic_report).
+Se desarrolló un script para realizar monitoreo de Prefect. Esto permite enviar emails con información sobre errores detectados en un período específico. Este script, junto a su módulo de formateo y envio de emails, están disponibles en: [src/monitoreo/periodic_report](https://github.com/lucasdepetrisd/prefect-test/blob/main/src/monitoreo/periodic_report).
 
 Está desplegado en Prefect y programado para ejecutarse automáticamente:
 
@@ -775,7 +775,7 @@ Si el despliegue ya existe, bastará con agregar los metadatos y luego redespleg
 
 Esta automatización garantiza que la información clave esté siempre accesible en los reportes de fallas, facilitando la gestión y resolución de problemas.
 
-Más detalles de la implementación del script que extrae los metadatos desde la descripción del despliegue y los procesa para su uso se puede encontrar en [src/monitoreo/periodic_report/extract_metadata.py](https://github.com/lucasdepetrisd/prefect-test/blob/main/dev/MONITOREO_PREFECT/periodic_report/extract_metadata.py).
+Más detalles de la implementación del script que extrae los metadatos desde la descripción del despliegue y los procesa para su uso se puede encontrar en [src/monitoreo/periodic_report/extract_metadata.py](https://github.com/lucasdepetrisd/prefect-test/blob/main/src/monitoreo/periodic_report/extract_metadata.py).
 
 ### 10.1.4 Watchdog
 
