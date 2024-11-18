@@ -164,7 +164,7 @@ Resultados:
 **Los *deploys* o despliegues son configuraciones que definen cómo y dónde se ejecutan los flujos de Prefect.** Son el paralelo a las tareas que utilizábamos en el Programador de Tareas de Windows. Incluyen detalles de la ejecución como:
 - **De donde se obtendrá el código:** local o un repositorio de GitHub
 - **Que paramétros se utilizarán**
-- **Cuando se ejecutará:** en un interval o una programación de Cron
+- **Cuando se ejecutará:** en un intervalo o una programación de Cron
 - **Donde y quien lo ejecutará:** en la maquina con una *work pool* local o de manera remota como AWS o Azure.
 
 > [!NOTE]
@@ -574,11 +574,15 @@ if __name__ == "__main__":
 ```
 
 # 10. SDK de Prefect
-Cuando interactuamos desde la IU de Prefect como cuando ejecutamos un despliegue, visualizamos las últimas ejecuciones, creamos una variable, etc, lo que estamos haciendo es enviar peticiones a la API del servidor de Prefect que esta corriendo por detrás y luego este servidor se encarga de realizar las operaciones necesarias para cumplir con la petición. Así como lo hacemos desde la interfaz de usuario tambien podemos realizar peticiones a la API directamente desde scripts, aunque si se lo realiza desde Python hay una opción mucho mejor que es el SDK (Software Development Kit) de Prefect.
+Cuando interactuamos desde la IU de Prefect como cuando ejecutamos un despliegue, visualizamos las últimas ejecuciones, creamos una variable, etc, lo que estamos haciendo es enviar peticiones a la API del servidor de Prefect que esta corriendo por detrás y luego este servidor se encarga de realizar las operaciones necesarias para cumplir con la petición. Así como lo hacemos desde la interfaz de usuario tambien podemos realizar peticiones a la API directamente desde scripts. Pero si se lo realiza desde Python hay una opción mucho mejor que es el SDK (Software Development Kit) de Prefect.
 
-Un SDK es un conjunto de herramientas que provee una aplicación para interactuar de manera programática con ella. En este caso Prefect provee su SDK al instalarlo como vimos en la sección [2.1 Instalar Prefect](#21-instalar-prefect). Para más información sobre el SDK de Prefect visitar su documentación [Prefect Client SDK](https://docs.prefect.io/latest/guides/using-the-client/).
+Un **SDK (Software Development Kit)** es un conjunto de herramientas, bibliotecas y recursos proporcionados por una aplicación o plataforma para permitir la interacción programática con ella. Su objetivo es facilitar el desarrollo de nuevas aplicaciones que puedan integrarse y comunicarse de manera eficiente con la aplicación o plataforma original. 
 
-El SDK de Prefect nos permite obtener inforamción información sobre el servidor y sus objetos, asi tambien como crear nuevos objetos o modificarlos. Por ejemplo si quisieramos chequear que el servidor de Prefect este funcionando:
+En este contexto, **Prefect** provee su SDK al instalarlo, como se explicó en la sección [2.1 Instalar Prefect](#21-instalar-prefect). Para más detalles sobre el SDK de Prefect, visitar su documentación [Prefect Client SDK](https://docs.prefect.io/latest/guides/using-the-client/).
+
+El SDK de Prefect permite acceder a información del servidor y sus objetos, además de facilitar la creación y modificación de objetos. Todas las acciones disponibles en la interfaz de usuario, y por lo tanto en su API, pueden ser replicadas mediante este SDK. 
+
+Por ejemplo, si quisieramos chequear que el servidor de Prefect está funcionando correctamente podríamos utilizar el SDK de la siguiente manera:
 
 ```python
 
@@ -592,7 +596,9 @@ async def check_prefect():
             print("Fallo al conectar con la siguiente excepción:" + e)
 ```
 
-Esto tambien nos puede servir para obtener información sobre ejecuciones, despliegues, flujos, tareas y cualquier tipo de objeto de Prefect. Para algunas de estas se necesitarán importar otras clases como por ejemplo para obtener ejecuciones de flujos fallidas necesitaremos de la clase `FlowRunFilter`. 
+El SDK de Prefect no solo nos permite verificar el estado del servidor, sino también acceder a información detallada sobre ejecuciones, despliegues, flujos, tareas y otros objetos de Prefect. Para realizar algunas operaciones específicas, como filtrar ejecuciones de flujos fallidas, es necesario importar clases adicionales, como `FlowRunFilter`.
+
+Por ejemplo, para obtener información de ejecuciones de flujo dentro de un rango de fechas y filtrar por estado, se podría usar el siguiente código:
 
 ```python
 from prefect.server.schemas.filters import FlowRunFilter
@@ -653,22 +659,39 @@ async def get_flow_runs_info(
 ```
 
 > [!TIP] 
-> **¿Como saber que necesitabamos de `FlorRunFilter`? ¿Qué otras clases necesito importar?**
+> **¿Cómo identificar que necesitamos `FlowRunFilter` y qué clases importar?**
 > 
-> Al empezar a escribir la linea que dice `client.*`, VS Code o el IDE que utilizemos nos sugerirá los métodos disponibles para esa clase `client`. Luego si pasamos el cursor por sobre el método se nos indicará que parámetros recibe. Por ejemplo en VS Code al escribir el método se nos apareceran las sugerencias de la siguiente manera:
+> Al escribir `client.` en VS Code o en otro IDE, aparecerán sugerencias con los métodos disponibles para la clase `client`. Estas sugerencias facilitan descubrir las funciones y características disponibles. Por ejemplo:
+> 
 > ![Sugerencias de Métodos](img/metodos_client.png)
-> Y luego se nos mostrarán los parámetros al pasar el curso asi:
-![Sugerencias de Parámetros](img/parametros_client.png)
-> Luego si quisieramos utilizar el parámetro `flow_run_filter` debemos utilizar la clase `FlowRunFilter` que se muestra en la imagen.
-> Para saber de donde proviene y como importar esta clase podemos entrar en la definición de la función o chequear la documentación del SDK de Prefect.
+> 
+> Al seleccionar un método y pasar el cursor sobre él, el IDE mostrará información detallada sobre los parámetros requeridos:
+> 
+> ![Sugerencias de Parámetros](img/parametros_client.png)
+> 
+> Si ves que un parámetro requiere un objeto como `flow_run_filter`, esto indica que necesitas utilizar una clase específica, como `FlowRunFilter`. 
+> 
+> Para identificar de dónde proviene y cómo importar esta clase, puedes:
+> - Ver la definición del método directamente en el IDE (clic derecho sobre el método y seleccionar *Ir a la definición*).
+> - Consultar la documentación oficial del SDK de Prefect para entender su uso y ejemplos prácticos.
 
-También si ya tenemos un despliegue subido y deseamos  programar ejecuciones en base a una lista de `datetime` podemos utilizar algo como esto:
+Si ya tenemos un despliegue configurado y queremos programar ejecuciones basadas en una lista de fechas y horas (`datetime`), podemos usar una función como la siguiente:
 
 ```python
 from prefect.client.schemas.objects import StateType, StateDetails
 from prefect.states import State
 
 async def schedule_executions_for_deploy(deploy_id: UUID, list_executions: list[datetime]) -> dict:
+    """
+    Programa ejecuciones para un despliegue específico en base a una lista de fechas.
+
+    Parámetros:
+    - deploy_id (UUID): ID del despliegue.
+    - list_executions (list[datetime]): Lista de fechas en las que se programarán las ejecuciones.
+
+    Retorna:
+    - dict: Información del último flujo programado.
+    """
     async with get_client() as client:
         for dt in list_executions:
             flow_run_info = await client.create_flow_run_from_deployment(
@@ -681,18 +704,29 @@ async def schedule_executions_for_deploy(deploy_id: UUID, list_executions: list[
                 ),
                 tags=["Programado por script"]
             )
-
     return flow_run_info
 ```
 
-Estas funciones se pueden encontrar de manera más completa y junto a otras más en el script: [ProyectosPython/dev/MONITOREO_PREFECT/get_prefect_info.py](https://github.com/DesarrollosElectra/ProyectosPython/blob/main/dev/MONITOREO_PREFECT/get_prefect_info.py)
+Puedes encontrar esta y otras funciones más detalladas en el script:  
+[ProyectosPython/dev/MONITOREO_PREFECT/get_prefect_info.py](https://github.com/DesarrollosElectra/ProyectosPython/blob/main/dev/MONITOREO_PREFECT/get_prefect_info.py)
+
+## 10.1 Scripts desarrollados con el SDK de Prefect
 
 Utilizar el SDK de Prefect nos permitió desarrollar los siguientes scripts:
 
-## 10.1 Monitoreo Periódico
-Para mejorar el monitoreo se desarrollaron scripts que utilizan el SDK y que permiten el envío de emails con información sobre las fallas de un período determinado. Estos scripts se encuentran en [ProyectosPython/dev/MONITOREO_PREFECT/periodic_report](https://github.com/DesarrollosElectra/ProyectosPython/blob/main/dev/MONITOREO_PREFECT/periodic_report). Se encuentran desplegados en Prefect por lo que se deberián enviar a las 23:55 de manera diaria y los domingos a esa misma hora de manera semanal.
+### 10.1.1 Monitoreo Periódico
+Se desarrolló un script para mejorar el monitoreo que permite enviar emails con información sobre errores detectados en un período específico. Este script, junto a su módulo de formateo y envio de emails, están disponibles en: [ProyectosPython/dev/MONITOREO_PREFECT/periodic_report](https://github.com/DesarrollosElectra/ProyectosPython/blob/main/dev/MONITOREO_PREFECT/periodic_report). 
 
-## 10.2 Watchdog
+Este script está desplegado en Prefect y programado para ejecutarse automáticamente:
+
+- **Diariamente:** a las 23:55.  
+- **Semanalmente:** los domingos a las 23:55.
+
+### 10.1.2 Información de Ejecuciones y Despliegues
+Otro script desarrollado es `get_prefect_info.py`, el cual permite obtener información detallada sobre ejecuciones de flujos, despliegues y otros objetos de Prefect. Este script utiliza el SDK de Prefect para interactuar con la API y obtener información sobre el estado de los flujos. El script está disponible en:  
+[ProyectosPython/dev/MONITOREO_PREFECT/get_prefect_info.py](https://github.com/DesarrollosElectra/ProyectosPython/blob/main/dev/MONITOREO_PREFECT/get_prefect_info.py).
+
+### 10.1.3 Watchdog
 
 > [!WARNING] 
 > **Watchdog deprecado**
