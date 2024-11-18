@@ -27,8 +27,11 @@
   - [Variables](#variables)
   - [Secrets](#secrets)
 - [10. SDK de Prefect](#10-sdk-de-prefect)
-  - [10.1 Monitoreo Periódico](#101-monitoreo-periódico)
-  - [10.2 Watchdog](#102-watchdog)
+  - [10.1 Scripts desarrollados con el SDK de Prefect](#101-scripts-desarrollados-con-el-sdk-de-prefect)
+    - [10.1.1 Información de Ejecuciones y Despliegues](#1011-información-de-ejecuciones-y-despliegues)
+    - [10.1.2 Monitoreo Periódico](#1012-monitoreo-periódico)
+    - [10.1.3 Metadatos](#1013-metadatos)
+    - [10.1.4 Watchdog](#1014-watchdog)
 - [11. Recursos](#11-recursos)
 
 ## 1.2 Esta guía
@@ -707,26 +710,69 @@ async def schedule_executions_for_deploy(deploy_id: UUID, list_executions: list[
     return flow_run_info
 ```
 
-Puedes encontrar esta y otras funciones más detalladas en el script:  
-[ProyectosPython/dev/MONITOREO_PREFECT/get_prefect_info.py](https://github.com/DesarrollosElectra/ProyectosPython/blob/main/dev/MONITOREO_PREFECT/get_prefect_info.py)
+Puedes encontrar esta y otras funciones más detalladas en la sección [10.1.2 Información de Ejecuciones y Despliegues](#1012-información-de-ejecuciones-y-despliegues).
 
 ## 10.1 Scripts desarrollados con el SDK de Prefect
 
 Utilizar el SDK de Prefect nos permitió desarrollar los siguientes scripts:
 
-### 10.1.1 Monitoreo Periódico
-Se desarrolló un script para mejorar el monitoreo que permite enviar emails con información sobre errores detectados en un período específico. Este script, junto a su módulo de formateo y envio de emails, están disponibles en: [ProyectosPython/dev/MONITOREO_PREFECT/periodic_report](https://github.com/DesarrollosElectra/ProyectosPython/blob/main/dev/MONITOREO_PREFECT/periodic_report). 
+### 10.1.1 Información de Ejecuciones y Despliegues
+El script `get_prefect_info.py` permite obtener información detallada sobre ejecuciones de flujos, despliegues y otros objetos de Prefect. Utiliza el SDK de Prefect para interactuar con su API y obtener el estado de los flujos.
 
-Este script está desplegado en Prefect y programado para ejecutarse automáticamente:
+Este script está disponible en:  
+[ProyectosPython/dev/MONITOREO_PREFECT/get_prefect_info.py](https://github.com/DesarrollosElectra/ProyectosPython/blob/main/dev/MONITOREO_PREFECT/get_prefect_info.py)
+
+**Funciones principales**:
+
+- **get_flow_runs_info**: Obtiene información de ejecuciones de flujo en un rango de fechas y estados específicos.
+- **get_flow_run_info**: Recupera detalles de una ejecución específica de flujo.
+- **get_flow_info**: Obtiene información de un flujo en particular.
+- **get_deployment_info**: Proporciona detalles sobre un despliegue.
+- **get_subflow_runs_info**: Obtiene información sobre ejecuciones de subflujos.
+- **schedule_executions_for_deploy**: Programa ejecuciones para un despliegue en fechas específicas.
+
+**Uso**:  
+El script permite consultar flujos, ejecuciones y despliegues de Prefect, proporcionando detalles como el estado, duración y parámetros de ejecución. Las consultas pueden filtrarse por fechas, estados y otros criterios.
+
+### 10.1.2 Monitoreo Periódico
+Se desarrolló un script para realizar monitoreo de Prefect. Esto permite enviar emails con información sobre errores detectados en un período específico. Este script, junto a su módulo de formateo y envio de emails, están disponibles en: [ProyectosPython/dev/MONITOREO_PREFECT/periodic_report](https://github.com/DesarrollosElectra/ProyectosPython/blob/main/dev/MONITOREO_PREFECT/periodic_report).
+
+Está desplegado en Prefect y programado para ejecutarse automáticamente:
 
 - **Diariamente:** a las 23:55.  
 - **Semanalmente:** los domingos a las 23:55.
 
-### 10.1.2 Información de Ejecuciones y Despliegues
-Otro script desarrollado es `get_prefect_info.py`, el cual permite obtener información detallada sobre ejecuciones de flujos, despliegues y otros objetos de Prefect. Este script utiliza el SDK de Prefect para interactuar con la API y obtener información sobre el estado de los flujos. El script está disponible en:  
-[ProyectosPython/dev/MONITOREO_PREFECT/get_prefect_info.py](https://github.com/DesarrollosElectra/ProyectosPython/blob/main/dev/MONITOREO_PREFECT/get_prefect_info.py).
+El script además utiliza el desarrollo de la siguiente sección [10.1.3 Metadatos](#1013-metadatos) para extraer información adicional de los despliegues.
 
-### 10.1.3 Watchdog
+### 10.1.3 Metadatos
+Al desplegar un flujo que posee en su definición un docstring, Prefect guarda este docstring como la descripción del despliegue. Esto nos permite embeber información adicional que luego puede ser parseada y utilizada para otros fines.
+
+Este desarrollo toma la descripción del despliegue, que incluye metadatos escritos en formato YAML, y los extrae automáticamente para su uso en otros procesos. Los metadatos deben comenzar con tres guiones (`---`) para indicar el inicio del bloque YAML. Los ítems más relevantes de los metadatos son el responsable y el área, ya que nos permiten identificar rápidamente quién es el referente técnico de un desarrollo cuando se produce una falla.
+
+Un ejemplo de cómo se vería este bloque de metadatos en la definición de un flujo sería:
+
+```python
+
+def mi_flujo():
+    """
+    Este flujo realiza una tarea específica.
+
+    ---
+    metadatos:
+        responsable: Juan Pérez
+        area: Compras
+        otros_detalles:
+        - Esta es una lista de ejemplos
+        - De otros detalles que pueden ser agregados
+```
+
+Si el despliegue ya existe, bastará con agregar los metadatos y luego redesplegarlo para que Prefect actualice la descripción con la nueva información. Así, el script de monitoreo periódico extraerá estos metadatos y los utilizará para enviar reportes de fallas.
+
+Esta automatización garantiza que la información clave esté siempre accesible en los reportes de fallas, facilitando la gestión y resolución de problemas.
+
+Más detalles de la implementación del script que extrae los metadatos desde la descripción del despliegue y los procesa para su uso se puede encontrar en [ProyectosPython/dev/MONITOREO_PREFECT/periodic_report/extract_metadata.py](https://github.com/DesarrollosElectra/ProyectosPython/blob/main/dev/MONITOREO_PREFECT/periodic_report/extract_metadata.py).
+
+### 10.1.4 Watchdog
 
 > [!WARNING] 
 > **Watchdog deprecado**
