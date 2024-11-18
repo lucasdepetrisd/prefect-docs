@@ -761,10 +761,16 @@ def mi_flujo():
     metadatos:
         responsable: Juan Pérez
         area: Compras
-        otros_detalles:
-        - Esta es una lista de ejemplos
-        - De otros detalles que pueden ser agregados
+        otros_detalles_lista:
+            - Esta es una lista de ejemplos
+            - De otros detalles que pueden ser agregados
+        mas_detalles_dict:
+            solicito: Fer
+            fecha: 2024-10-10
+            ejecucion: diariamente
+    """
 ```
+*Los datos pueden ponerse como lista o como diccionario con una clave y valor. Recordar revisar el indentado correcto de los metadatos.*
 
 Si el despliegue ya existe, bastará con agregar los metadatos y luego redesplegarlo para que Prefect actualice la descripción con la nueva información. Así, el script de monitoreo periódico extraerá estos metadatos y los utilizará para enviar reportes de fallas.
 
