@@ -32,6 +32,7 @@
     - [10.1.2 Monitoreo Periódico](#1012-monitoreo-periódico)
     - [10.1.3 Metadatos](#1013-metadatos)
     - [10.1.4 Watchdog](#1014-watchdog)
+  - [10.2 Limpieza de Base de Datos](#102-limpieza-de-base-de-datos)
 - [11. Recursos](#11-recursos)
 
 ## 1.2 Esta guía
@@ -54,15 +55,22 @@ Esta plataforma sigue la idea de *"[code as workflows](https://www.prefect.io/bl
 Para instalar prefect se sugiere leer la documentación oficial con las instrucciones. Se sugiere para evitar problemas a futuro instalarlo desde el principio en un entorno virtual y evitar de todas formas que este instalado de manera global. Esto puede llevar a problemas en un futuro ya que se crearán dos instalaciones distintas de prefect. Aquí se describen los pasos para configurarlo de la manera que está en Electra utilizando Windows.
 
 1. Crear un entorno virtual.
-2. Instalar prefect utilizando `pip install prefect`.
+2. Instalar Prefect utilizando `pip install prefect`.
 3. Chequear que se instalo correctamente con `prefect version`.
-3. Configurar prefect. Para esto ejecutar `prefect config view` para ver como esta configurado.
-   1. Primero deberemos indicarle a prefect donde debera almacenar la configuración, su base de datos y demás información del servidor.
+3. Configurar Prefect. Para esto ejecutar `prefect config view` para ver como esta configurado.
+   1. Primero deberemos indicarle a Prefect donde debera almacenar la configuración, su base de datos y demás información del servidor.
       1. Para esto se debe crear una variable de entorno del sistema ingresando al editor de variables de entorno de Windows.
-      2. Luego crear una variable del sistema con nombre `PREFECT_HOME` y valor `C:\Users\tareas\.prefect`. Esto permitirá que la configuración la almacene el usuario de servicio `tareas`. 
-      3. Reiniciar la terminal y ejecutar nuevamente `prefect config view` para chequear que se haya guardado y detectado correctamente.
+      2. Luego crear una variable del sistema con nombre `PREFECT_HOME` y valor `C:\Users\tareas\.prefect`. Esto permitirá que la configuración la almacene el usuario de servicio `tareas`.
+      3. Reiniciar la terminal y el servidor y ejecutar nuevamente `prefect config view` para chequear que se haya guardado y detectado correctamente. Si aparece como `PREFECT_HOME='C:\Users\tareas\.prefect'` entonces se guardó correctamente.
    2. Luego debemos configurar el logging. Para esto chequear la sección [6.3. Logger Personalizado](#63-logger-personalizado).
-   3. Finalmente debemos asignar la URL de Prefect para que maquinas remotas (PCs de desarrolladores) se puedan conectar y abrir la interfaz. Aquí ejecutar `prefect config set PREFECT_API_URL='http://192.168.1.13:442/api'`.
+   3. Configurar el limite de objetos de la API. Esto es utilizado por algunos desarrollos de monitoreo. Para esto ejecutar `prefect config set PREFECT_API_DEFAULT_LIMIT=2000`.
+   4. Finalmente debemos asignar la URL de la API del Servidor de Prefect para que clientes de Prefect en la misma red (PCs de Desarrolladores) puedan interactuar con el servidor y abrir la interfaz web. Aquí ejecutar: 
+
+        ```bash
+        prefect config set PREFECT_API_URL='http://192.168.1.13:442/api'
+        prefect config set PREFECT_SERVER_API_HOST='192.168.1.13'
+        prefect config set PREFECT_SERVER_API_PORT='442'
+        ```
 
 # 3. Flujos y Tareas
 
@@ -506,13 +514,13 @@ Los perfiles en Prefect permiten a los usuarios configurar y almacenar ajustes e
 Entre las configuraciones principales de los perfiles se encuentran
 
 * `PREFECT_API_URL='http://192.168.1.13:442/api'` para indicar que las ejecuciones y *deploys* se dirijan a esa URL.
-* `PREFECT_LOGGING_SETTINGS_PATH='C:\Users\usuario\.prefect\logging_new.yml'` para configurar el logeo con consulterscommons.log_tools
+* `PREFECT_LOGGING_SETTINGS_PATH='C:\Users\tareas\.prefect\logging_new.yml'` para configurar el logeo con consulterscommons.log_tools
 
 Además se pueden pueden agregar tambien variables para que en el momento de la ejecución Prefect las levante y utilice esos valores de manera global.
 
 Para configurar la carpeta donde se guardará la base de datos de Prefect junto con su configuración se debe setear la variable de entorno `PREFECT_HOME` **a nivel sistema.**
 
-* `$env:PREFECT_HOME = 'C:\Users\usuario\.prefect'`
+* `$env:PREFECT_HOME = 'C:\Users\tareas\.prefect'`
 
 Para evitar advertencias de codificación en Windows al ejecutar flujos se debe setear la variable de entorno `PYTHONUTF8` **a nivel sistema.**
 
@@ -790,6 +798,13 @@ Las ejecuciones a veces pueden quedar atascadas, la conexión se puede caer y la
 Watchdog revisa ejecuciones en estado `Late` en las que la hora actual difiere de la hora de ejecución programada en por ejemplo 4 horas. O también ejecuciones en estado `Running` que estuvieron durante más de 2 horas corriendo. Este script se encarga de cambiar su estado a `Cancelled` para así no tener en el registro ejecuciones tardías o congeladas.
 
 Para más info visitar el script [Watchdog](src/watchdog/watchdog.py).
+
+## 10.2 Limpieza de Base de Datos
+Con el SDK de Prefect también se pueden realizar tareas de limpieza de la base de datos. Por ejemplo, se pueden eliminar ejecuciones de flujos y tareas antiguas. Al eliminar un flujo que ejecutó tareas también se eliminarán las ejecuciones de estas tareas.
+
+Se creó un script para esto ubicado en: [MONITOREO_PREFECT/db_cleanup/db_cleanup.py](https://github.com/DesarrollosElectra/ProyectosPython/blob/main/dev/MONITOREO_PREFECT/db_cleanup/db_cleanup.py).
+
+El script recibe como parámetros la fecha inicial y final en la que se desea realizar la limpieza y eliminar las ejecuciones de flujos de ese rango de fechas.
 
 # 11. Recursos
 
